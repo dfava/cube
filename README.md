@@ -8,14 +8,14 @@ A Rubik's cube implementation in Go.  Supports cubes of size `n x n x n` for `n`
 package main
 
 import (
-  "fmt"
-  "github.com/dfava/cube"
+	"fmt"
+	"github.com/dfava/cube"
 )
 
 func main() {
 	var cb Cube
 	cb.Init(3)
-  fmt.Println(cb)
+	fmt.Println(cb)
 }
 ```
 
