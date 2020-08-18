@@ -2,14 +2,34 @@
 
 A Rubik's cube implementation in Go.  Supports cubes of size `n x n x n` for `n` larger than one.
 
+## Use
+
+```
+package main
+
+import (
+  "fmt"
+  "github.com/dfava/cube"
+)
+
+func main() {
+	var cb Cube
+	cb.Init(3)
+  fmt.Println(cb)
+}
+```
+
+See more examples in `example.go`.
+
+
 ## Representation
 
 I wanted a representation where we could leverage the cube's geometry.  By geometry I mean that I wanted to be able to use rotation matrices and basic linear algebra to manipulate the cube.  The cube is an object in three dimensions, in principle, we should be able to capture exactly that.  In practice, a representation that capture the cube's geometry would generalize better.  It should be as easy to create and manipulate a `7x7x7` cube (or any other configuration) as it is a `3x3x3`, which is the standard Rubik's cube.
 
 ### Why not a matrix?
 
-A cube has six sides, so, one obvious possible representation is as an array of length 6 containing elements that are `nxn`.  In other words, to flatten out the cube into 2D arrays.
-Another possible representation is to create an `n x n x n` matrix.
+A cube has six sides, so, one obvious possible representation is as an array of length 6 containing elements that are `n`-by-`n`.  In other words, to flatten out the cube into 2D arrays.
+Another possible representation is to create an `n`-by-`n`-by-`n` matrix.
 
 These representations relate the geometry of the cube with the memory layout of its implementation.  This gives us the sense that we are accurately capturing the essence of what it is to be a cube.  This "sense" is more an "illusion."  I would say that the essence of the Rubik's cube is not its static, physical configuration but its dynamism, meaning, *how its configuration is allowed to change*.  The essence of a Rubik's cube are the operations, the moves we can make.
 
