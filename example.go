@@ -1,8 +1,8 @@
 package main
 
 import (
-  "fmt"
-  . "github.com/dfava/cube"
+	"fmt"
+	. "github.com/dfava/cube"
 )
 
 func printCubesOfDifferentSizes() {
@@ -43,13 +43,13 @@ func printAllRotations(n uint) {
 }
 
 func main() {
-  //PrintInColors(false)
+	//PrintInColors(false)
 	var cb Cube
 	cb.Init(3)
-  fmt.Println("Cubes of different sizes")
+	fmt.Println("Cubes of different sizes")
 	printCubesOfDifferentSizes()
-  fmt.Println()
-  fmt.Println("Performing all moves on a Rubik's cube starting from the initial configuration")
+	fmt.Println()
+	fmt.Println("Performing all moves on a Rubik's cube starting from the initial configuration")
 	printAllRotations(3)
 	return
 }
