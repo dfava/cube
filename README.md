@@ -4,6 +4,14 @@ A Rubik's cube implementation in Go.  Supports cubes of size `n x n x n` for `n`
 
 ## Use
 
+Installing the package:
+
+```
+go get -v github.com/dfava/cube
+```
+
+then using it:
+
 ```
 package main
 
@@ -19,7 +27,7 @@ func main() {
 }
 ```
 
-See more examples in `example.go`.
+For more, see `example.go`.
 
 
 ## Representation
