@@ -312,21 +312,19 @@ func (cb *Cube) Init(n uint) {
 	}
 }
 
-func (cb *Cube) Permute(n uint, times uint) {
-	rand.Seed(42) // Pseudo random
+func (cb *Cube) Permute(times uint) {
 	axes := [...]Axis{Xax, Yax, Zax}
-	idxs := make([]int, n)
-	for idx := -int(n) / 2; idx <= int(n)/2; idx++ {
-		idxs[idx+int(n)/2] = idx
+	idxs := make([]int, cb.n)
+	for idx := -int(cb.n) / 2; idx <= int(cb.n)/2; idx++ {
+		idxs[idx+int(cb.n)/2] = idx
 	}
 	dirs := [...]bool{true, false}
-	cb.Init(n)
 	var perms uint
 	for perms < times {
 		ax := axes[rand.Intn(len(axes))]  // pick an axis
 		idx := idxs[rand.Intn(len(idxs))] // pick an idex
 		dir := dirs[rand.Intn(len(dirs))] // pick a direction
-		if n%2 == 0 && idx == 0 {
+		if cb.n%2 == 0 && idx == 0 {
 			continue
 		}
 		perms += 1
@@ -346,9 +344,10 @@ func (cb Cube) New() Cube {
 }
 
 func init() {
-  printInColors = true
+	printInColors = true
+	rand.Seed(42) // Pseudo random
 }
 
 func PrintInColors(flag bool) {
-  printInColors = flag
+	printInColors = flag
 }
