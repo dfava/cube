@@ -55,6 +55,7 @@ func main() {
 	fmt.Println("Performing moves at random")
 	cb.Init(3)
 	fmt.Println(cb)
+	fmt.Println()
 	for perm := 0; perm < 10; perm++ {
 		cb.Permute(1)
 		fmt.Println(cb)
