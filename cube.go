@@ -314,7 +314,7 @@ func (cb *Cube) Init(n uint) {
 
 func (cb *Cube) Permute(times uint) {
 	axes := [...]Axis{Xax, Yax, Zax}
-	idxs := make([]int, cb.n)
+	idxs := make([]int, cb.n+(cb.n+1)%2)
 	for idx := -int(cb.n) / 2; idx <= int(cb.n)/2; idx++ {
 		idxs[idx+int(cb.n)/2] = idx
 	}
