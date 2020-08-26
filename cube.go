@@ -113,7 +113,7 @@ func (fl Flat) String() string {
 }
 
 // Populate a Flat structure given a Cubi.
-// 
+//
 // A Cubi is composed of a location in space (captured by a Vec) and
 // of a description on how to paint that location (captured by a CVec,
 // aka color vector).
@@ -185,7 +185,7 @@ type CVec [3]Color    // a "color vector
 type Matrix [3][3]int // a matrix
 
 // Multiplying a matrix by a Cubi
-// 
+//
 // The function multiplies the matrix by the position vector and
 // it multiplies the matrix by the color vector
 func (m *Matrix) Mult(cbi Cubi) Cubi {
@@ -313,10 +313,9 @@ func (cb *Cube) Init(n uint) {
 					continue
 				}
 
-
 				// Give xc a color if x is at the Cubi has a face on
 				// either side of the x axis.  Same for yc, zc and the y, z axes.
-				extremity := int(n/2)
+				extremity := int(n / 2)
 				var xc, yc, zc Color
 				if x == extremity {
 					xc = orange
@@ -358,6 +357,29 @@ func (cb *Cube) Shuffle(times uint) {
 		(*cb) = cb.Rotate(ax, idx, dir)
 		perms += 1
 	}
+}
+
+func (cb *Cube) IsSolved() bool {
+	// We could do with [3][2]Color, I'm wasting a bit of memory to simplify
+	// the algorithm:
+	// Signs -1 and 1 map to array indexes 0 and 2 as opposed to 0 and 1
+	var sideColor [3][3]Color
+	extremity := int((cb.n) / 2)
+	for idx := range cb.cubis {
+		//fmt.Println(cb.cubis[idx].pv, cb.cubis[idx].cv)
+		for _, ax := range [...]Axis{Xax, Yax, Zax} {
+			for sign := range []int{-1, 1} {
+				if cb.cubis[idx].pv[ax] == sign*extremity {
+					if sideColor[ax][sign+1] == zero {
+						sideColor[ax][sign+1] = cb.cubis[idx].cv[ax]
+					} else if sideColor[ax][sign+1] != cb.cubis[idx].cv[ax] {
+						return false
+					}
+				}
+			}
+		}
+	}
+	return true
 }
 
 // A copy-constructor
