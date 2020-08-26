@@ -32,10 +32,10 @@ func (c Color) Abs() Color {
 }
 
 func Sign(x int) int {
-  if x < 0 {
-    return -1
-  }
-  return 1
+	if x < 0 {
+		return -1
+	}
+	return 1
 }
 
 // using ANSI escape codes for colors
@@ -313,20 +313,24 @@ func (cb *Cube) Init(n uint) {
 					continue
 				}
 
+
+				// Give xc a color if x is at the Cubi has a face on
+				// either side of the x axis.  Same for yc, zc and the y, z axes.
+				extremity := int(n/2)
 				var xc, yc, zc Color
-				if x > 0 {
+				if x == extremity {
 					xc = orange
-				} else if x < 0 {
+				} else if x == -extremity {
 					xc = -red
 				}
-				if y > 0 {
+				if y == extremity {
 					yc = green
-				} else if y < 0 {
+				} else if y == -extremity {
 					yc = -blue
 				}
-				if z > 0 {
+				if z == extremity {
 					zc = yellow
-				} else if z < 0 {
+				} else if z == -extremity {
 					zc = -white
 				}
 				cb.cubis[ncubi] = Cubi{cv: CVec{xc, yc, zc}, pv: Vec{x, y, z}}
