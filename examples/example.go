@@ -61,7 +61,7 @@ func main() {
 	fmt.Println(cb)
 	fmt.Println()
 	for perm := 0; perm < 10; perm++ {
-		cb.Permute(1)
+		cb.Shuffle(1)
 		fmt.Println(cb)
 		fmt.Println()
 	}

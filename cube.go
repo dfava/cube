@@ -31,11 +31,18 @@ func (c Color) Abs() Color {
 	return c
 }
 
+func Sign(x int) int {
+  if x < 0 {
+    return -1
+  }
+  return 1
+}
+
 // using ANSI escape codes for colors
 func (c Color) String() string {
 	var names [7]string
 	if printInColors {
-		names = [...]string{" ", "\033[32mg\033[0m", "\033[37mw\033[0m", "\033[35mo\033[0m", "\033[31mr\033[0m", "\033[33my\033[0m", "\033[34mb\033[0m"} // no orange, using magente instead
+		names = [...]string{" ", "\033[32mg\033[0m", "\033[37mw\033[0m", "\033[35mo\033[0m", "\033[31mr\033[0m", "\033[33my\033[0m", "\033[34mb\033[0m"} // no orange, using magenta instead
 	} else {
 		names = [...]string{" ", "g", "w", "o", "r", "y", "b"}
 	}
@@ -47,10 +54,18 @@ func (c Color) String() string {
 	return str + names[c]
 }
 
-// A cube flattened into a 9x12 matrix
-// The goal is to make it easy to print a cube to the screen
+// Flat is a data-structure that makes it easy to represent a cube
+// as a string (for example, when printing it to the screen).
 //
-// The key for reading the picture below is:
+// Flat is a representation in which the cube is "opened up" and
+// flattened into two dimensions.
+//
+// A cube of size n^3 is flattened into a 2D matrix of size (3*n)x(4*n).
+//
+// For example, the Rubik's cube, which is of size n=3^3, is flattened
+// into a 9x12 matrix.  Below we show a picture of the flattened Rubik's
+// cube.  The key for reading the picture below is:
+//
 //   u for `up`
 //   l for `left`
 //   c for `center`
@@ -97,23 +112,23 @@ func (fl Flat) String() string {
 	return str
 }
 
+// Populate a Flat structure given a Cubi.
+// 
+// A Cubi is composed of a location in space (captured by a Vec) and
+// of a description on how to paint that location (captured by a CVec,
+// aka color vector).
+//
+// We use the Vec and CVec to find the indices in Flat that need to be
+// populated, and we use the CVec to determine the string representation
+// the location's color.
 func (fl *Flat) PaintCubi(cbi Cubi, n uint) {
 	var offset float64
 	if n%2 == 0 {
 		offset = 0.5
 	}
-	signX := -1.0
-	if cbi.pv[Xax] < 0 {
-		signX = 1.0
-	}
-	signY := -1.0
-	if cbi.pv[Yax] < 0 {
-		signY = 1.0
-	}
-	signZ := -1.0
-	if cbi.pv[Zax] < 0 {
-		signZ = 1.0
-	}
+	signX := float64(-1 * Sign(cbi.pv[Xax]))
+	signY := float64(-1 * Sign(cbi.pv[Yax]))
+	signZ := float64(-1 * Sign(cbi.pv[Zax]))
 	if cbi.cv[Xax] > 0 {
 		r := int(n/2) - int(math.Ceil(float64(cbi.pv[Zax])+signZ*offset))
 		c := int(n/2) - int(math.Ceil(float64(cbi.pv[Yax])+signY*offset))
@@ -169,7 +184,10 @@ type Vec [3]int       // a vector in 3D
 type CVec [3]Color    // a "color vector
 type Matrix [3][3]int // a matrix
 
-// Matrix multiplication by "color vector"
+// Multiplying a matrix by a Cubi
+// 
+// The function multiplies the matrix by the position vector and
+// it multiplies the matrix by the color vector
 func (m *Matrix) Mult(cbi Cubi) Cubi {
 	var ret Cubi
 	for i := 0; i <= 2; i++ {
@@ -189,7 +207,7 @@ type Cube struct {
 	cubis []Cubi
 }
 
-// A string representation of a rubik's cube
+// A string representation of a Rubik's cube
 func (cb Cube) String() string {
 	var fl Flat
 	fl.PaintCube(cb)
@@ -248,26 +266,28 @@ func GetRotationMatrix(a Axis, counter bool) Matrix {
 }
 
 // Rotates a cube by multiplying the relevant little cubes by a rotation matrix
-func (cb Cube) Rotate(a Axis, idx int, c bool) Cube {
+func (cb Cube) Rotate(a Axis, idx int, counter bool) Cube {
 	ret := cb.New()
-	m := GetRotationMatrix(a, c)
+	m := GetRotationMatrix(a, counter)
 	for cb_idx := range cb.cubis {
 		if cb.cubis[cb_idx].pv[a] == idx {
-			// Rotate
+			// We rotate via matrix multiplication
 			ret.cubis[cb_idx] = m.Mult(cb.cubis[cb_idx])
 		}
 	}
 	return ret
 }
 
-// Can handle cubes for n>2.  Cannot handle 1x1 cube
+// Returns a cube of size n^3 in its initial configuration.
+// Handles cubes of n>2.  Cannot handle the trivial 1x1 cube
+//
 // Initializes the cube to:
-// g at the center   (y>0)
-// b to the back     (y<0)
-// r to the left     (x<0)
-// o to the right    (x>0)
-// y upward          (z>0)
-// w downward        (z<0)
+// green  at the center   (y>0)
+// blue   to the back     (y<0)
+// red    to the left     (x<0)
+// orange to the right    (x>0)
+// yellow upward          (z>0)
+// white  downward        (z<0)
 func (cb *Cube) Init(n uint) {
 	(*cb).n = n
 	(*cb).cubis = make([]Cubi, int(math.Pow(float64(n), 3)-math.Pow(float64(n)-2, 3)))
@@ -316,7 +336,7 @@ func (cb *Cube) Init(n uint) {
 	}
 }
 
-func (cb *Cube) Permute(times uint) {
+func (cb *Cube) Shuffle(times uint) {
 	axes := [...]Axis{Xax, Yax, Zax}
 	idxs := make([]int, cb.n+(cb.n+1)%2)
 	for idx := -int(cb.n) / 2; idx <= int(cb.n)/2; idx++ {
@@ -326,13 +346,13 @@ func (cb *Cube) Permute(times uint) {
 	var perms uint
 	for perms < times {
 		ax := axes[rand.Intn(len(axes))]  // pick an axis
-		idx := idxs[rand.Intn(len(idxs))] // pick an idex
+		idx := idxs[rand.Intn(len(idxs))] // pick an index
 		dir := dirs[rand.Intn(len(dirs))] // pick a direction
 		if cb.n%2 == 0 && idx == 0 {
 			continue
 		}
-		perms += 1
 		(*cb) = cb.Rotate(ax, idx, dir)
+		perms += 1
 	}
 }
 
