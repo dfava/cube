@@ -265,8 +265,9 @@ func GetRotationMatrix(a Axis, counter bool) Matrix {
 	return ret
 }
 
-// Rotates a cube by multiplying the relevant little cubes by a rotation matrix
-func (cube Cube) Rotate(a Axis, idx int, counter bool) Cube {
+// Performs a move on a cube by turning part of the
+// cube about an Axis in a particular direction
+func (cube Cube) Turn(a Axis, idx int, counter bool) Cube {
 	ret := cube.New()
 	m := GetRotationMatrix(a, counter)
 	for cube_idx := range cube.cubis {
@@ -274,6 +275,17 @@ func (cube Cube) Rotate(a Axis, idx int, counter bool) Cube {
 			// We rotate via matrix multiplication
 			ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
 		}
+	}
+	return ret
+}
+
+// Rotate the whole cube in 3 dimensions
+func (cube Cube) Rotate(a Axis, counter bool) Cube {
+	ret := cube.New()
+	m := GetRotationMatrix(a, counter)
+	for cube_idx := range cube.cubis {
+		// We rotate via matrix multiplication
+		ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
 	}
 	return ret
 }
@@ -354,7 +366,7 @@ func (cube *Cube) Shuffle(times uint) {
 		if cube.n%2 == 0 && idx == 0 {
 			continue
 		}
-		(*cube) = cube.Rotate(ax, idx, dir)
+		(*cube) = cube.Turn(ax, idx, dir)
 		perms += 1
 	}
 }

@@ -38,7 +38,7 @@ func printAllRotations(n uint) {
 				fmt.Println(ax, idx, dir)
 				fmt.Println(cb)
 				fmt.Println()
-				c2 = cb.Rotate(ax, idx, dir)
+				c2 = cb.Turn(ax, idx, dir)
 				fmt.Println(c2)
 				fmt.Println()
 			}
