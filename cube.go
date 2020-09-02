@@ -223,13 +223,27 @@ const (
 )
 
 func (ax Axis) String() string {
-	names := [...]string{"Xax", "Yax", "Zax"}
+	names := [...]string{"x", "y", "z"}
 	return names[ax]
+}
+
+type Direction bool
+
+const (
+	Clock        = false
+	Counterclock = true
+)
+
+func (dir Direction) String() string {
+	if dir {
+		return "counterclockwise"
+	}
+	return "clockwise"
 }
 
 // Returns a 90 degree rotation matrix about an axis,
 // either counter-clockwise or clockwise
-func GetRotationMatrix(a Axis, counter bool) Matrix {
+func GetRotationMatrix(a Axis, counter Direction) Matrix {
 	var ret Matrix
 	if a == Xax {
 		if counter {
@@ -267,7 +281,7 @@ func GetRotationMatrix(a Axis, counter bool) Matrix {
 
 // Performs a move on a cube by turning part of the
 // cube about an Axis in a particular direction
-func (cube Cube) Turn(a Axis, idx int, counter bool) Cube {
+func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
 	ret := cube.New()
 	m := GetRotationMatrix(a, counter)
 	for cube_idx := range cube.cubis {
@@ -280,7 +294,7 @@ func (cube Cube) Turn(a Axis, idx int, counter bool) Cube {
 }
 
 // Rotate the whole cube in 3 dimensions
-func (cube Cube) Rotate(a Axis, counter bool) Cube {
+func (cube Cube) Rotate(a Axis, counter Direction) Cube {
 	ret := cube.New()
 	m := GetRotationMatrix(a, counter)
 	for cube_idx := range cube.cubis {
@@ -357,7 +371,7 @@ func (cube *Cube) Shuffle(times uint) {
 	for idx := -int(cube.n) / 2; idx <= int(cube.n)/2; idx++ {
 		idxs[idx+int(cube.n)/2] = idx
 	}
-	dirs := [...]bool{true, false}
+	dirs := [...]Direction{Counterclock, Clock}
 	var perms uint
 	for perms < times {
 		ax := axes[rand.Intn(len(axes))]  // pick an axis

@@ -27,7 +27,7 @@ func main() {
 }
 ```
 
-For more, see `example.go`.
+For more, see the `examples` folder.
 
 
 ## Representation
