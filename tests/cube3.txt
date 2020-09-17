@@ -1,0 +1,9 @@
+        o o o                 
+        g y g                 
+        o o o                 
+g r g | w w w | b o b | y y y 
+y r y | g g g | w o w | b b b 
+g r g | w w w | b o b | y y y 
+        r r r                 
+        b w b                 
+        r r r                 

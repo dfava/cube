@@ -30,13 +30,6 @@ func (c Color) Abs() Color {
 	return c
 }
 
-func Sign(x int) int {
-	if x < 0 {
-		return -1
-	}
-	return 1
-}
-
 // using ANSI escape codes for colors
 func (c Color) String() string {
 	var names [7]string
@@ -53,9 +46,30 @@ func (c Color) String() string {
 	return str + names[c]
 }
 
+var stringToColor map[string]Color
+
+func ToColor(color string) Color {
+	return stringToColor[color]
+}
+
 type Vec [3]int       // a vector in 3D
 type CVec [3]Color    // a "color vector
 type Matrix [3][3]int // a matrix
+
+func (a CVec) or(b CVec) CVec {
+	var c CVec
+	or := func(a Color, b Color) Color {
+		if a == zero {
+			return b
+		} else {
+			return a
+		}
+	}
+	c[0] = or(a[0], b[0])
+	c[1] = or(a[1], b[1])
+	c[2] = or(a[2], b[2])
+	return c
+}
 
 // Multiplying a matrix by a Cubi
 //
@@ -294,6 +308,21 @@ func (cube Cube) New() Cube {
 func init() {
 	printInColors = true
 	rand.Seed(42) // Pseudo random
+
+	stringToColor = make(map[string]Color)
+	stringToColor[" "] = zero
+	stringToColor["g"] = green
+	stringToColor["w"] = white
+	stringToColor["o"] = orange
+	stringToColor["r"] = red
+	stringToColor["y"] = yellow
+	stringToColor["b"] = blue
+	stringToColor["\033[32mg\033[0m"] = green
+	stringToColor["\033[37mw\033[0m"] = white
+	stringToColor["\033[35mo\033[0m"] = orange
+	stringToColor["\033[31mr\033[0m"] = red
+	stringToColor["\033[33my\033[0m"] = yellow
+	stringToColor["\033[34mb\033[0m"] = blue
 }
 
 func PrintInColors(flag bool) {
