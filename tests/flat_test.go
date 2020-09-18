@@ -29,7 +29,7 @@ func TestFromFile3(t *testing.T) {
 	fmt.Println(cube)
 }
 
-func testCube2Flat2Cube(t *testing.T, sizes [4]uint) {
+func testCube2Flat2Cube(t *testing.T, sizes []uint) {
 	for _, n := range sizes {
 		for _, shuffle := range [...]uint{0, 1, 2, 10, 13} {
 			var cube Cube
@@ -48,10 +48,10 @@ func testCube2Flat2Cube(t *testing.T, sizes [4]uint) {
 }
 
 func TestCube2Flat2CubeOdd(t *testing.T) {
-	testCube2Flat2Cube(t, [...]uint{3, 5, 7, 9})
+	testCube2Flat2Cube(t, []uint{3, 5, 7, 9})
 }
 
 // Disabled for now. TODO: Enable by renaming to Test...
 func testCube2Flat2CubeEven(t *testing.T) {
-	testCube2Flat2Cube(t, [...]uint{2, 4, 6, 8})
+	testCube2Flat2Cube(t, []uint{2, 4, 6, 8})
 }

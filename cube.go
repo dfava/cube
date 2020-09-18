@@ -268,6 +268,9 @@ func (cube *Cube) Shuffle(times uint) {
 			continue
 		}
 		(*cube) = cube.Turn(ax, idx, dir)
+		if idx == 0 { // Preserve the cube's orientation
+			(*cube) = cube.Rotate(ax, !dir)
+		}
 		perms += 1
 	}
 }
@@ -292,6 +295,30 @@ func (cube *Cube) IsSolved() bool {
 		}
 	}
 	return true
+}
+
+func (cube *Cube) IsCanonical() bool {
+	if cube.n%2 == 0 { // Only odd sized cubes can be canonical
+		return false
+	}
+	canon := true
+	extremity := int(cube.n / 2)
+	for _, cubi := range cube.cubis {
+		if (cubi.pv == Vec{-extremity, 0, 0}) {
+			canon = canon && (cubi.cv[Xax] == -red)
+		} else if (cubi.pv == Vec{extremity, 0, 0}) {
+			canon = canon && (cubi.cv[Xax] == orange)
+		} else if (cubi.pv == Vec{0, -extremity, 0}) {
+			canon = canon && (cubi.cv[Yax] == -blue)
+		} else if (cubi.pv == Vec{0, extremity, 0}) {
+			canon = canon && (cubi.cv[Yax] == green)
+		} else if (cubi.pv == Vec{0, 0, -extremity}) {
+			canon = canon && (cubi.cv[Zax] == -white)
+		} else if (cubi.pv == Vec{0, 0, extremity}) {
+			canon = canon && (cubi.cv[Zax] == yellow)
+		}
+	}
+	return canon
 }
 
 // A copy-constructor
