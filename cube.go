@@ -180,6 +180,26 @@ func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
 	return ret
 }
 
+func (cube Cube) getAllTurns() []Cube {
+	var ret []Cube
+	for _, ax := range [...]Axis{Xax, Yax, Zax} {
+		for idx := -int(cube.n) / 2; idx <= int(cube.n)/2; idx++ {
+			for _, dir := range [...]Direction{Counterclock, Clock} {
+				if cube.n%2 == 0 && idx == 0 {
+					continue
+				}
+				newCube := cube.Turn(ax, idx, dir)
+				if cube.n%2 == 1 && idx == 0 {
+					// Preserves a canonical cube
+					newCube = newCube.Rotate(ax, !dir)
+				}
+				ret = append(ret, newCube)
+			}
+		}
+	}
+	return ret
+}
+
 // Rotate the whole cube in 3 dimensions
 func (cube Cube) Rotate(a Axis, counter Direction) Cube {
 	ret := cube.New()
