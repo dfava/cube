@@ -180,7 +180,8 @@ func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
 	return ret
 }
 
-func (cube Cube) getAllTurns() []Cube {
+// Perform all moves on a cube
+func (cube Cube) GetAllTurns() []Cube {
 	var ret []Cube
 	for _, ax := range [...]Axis{Xax, Yax, Zax} {
 		for idx := -int(cube.n) / 2; idx <= int(cube.n)/2; idx++ {
@@ -209,6 +210,40 @@ func (cube Cube) Rotate(a Axis, counter Direction) Cube {
 		ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
 	}
 	return ret
+}
+
+// Perform all rotations on a cube
+// There are 24 equivalence classes (rotations) of a cube.
+func (cube Cube) GetAllRotations() []Cube {
+	var ret []Cube
+
+	current := cube
+	explored := make(map[string]Cube)
+	var toExplore []Cube
+
+	for {
+		explored[current.String()] = current
+
+		for _, ax := range [...]Axis{Xax, Yax, Zax} {
+			for _, dir := range [...]Direction{Counterclock, Clock} {
+				other := current.Rotate(ax, dir)
+				if _, in := explored[other.String()]; !in {
+					toExplore = append(toExplore, other)
+				}
+			}
+		}
+
+		if len(toExplore) == 0 {
+			// Nothing more to explore
+			for k := range explored {
+				ret = append(ret, explored[k])
+			}
+			return ret
+		}
+
+		current = toExplore[0]
+		toExplore = toExplore[1:len(toExplore)]
+	}
 }
 
 // Returns a cube of size n^3 in its initial configuration.

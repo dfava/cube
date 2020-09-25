@@ -196,6 +196,10 @@ func (fl *Flat) PaintCube(cube Cube) {
 	}
 }
 
+func (fl *Flat) FromString(cube string) {
+	// TODO: Implement
+}
+
 func (fl *Flat) FromFile(fname string) {
 	buf, err := os.Open(fname)
 	if err != nil {
