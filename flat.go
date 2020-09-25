@@ -252,6 +252,7 @@ func (fl *Flat) FromFile(fname string) {
 	}
 }
 
+// TODO: Not working for cubes of even size
 func (fl Flat) ToCube() Cube {
 	n := len(fl) / 3
 

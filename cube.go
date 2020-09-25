@@ -166,6 +166,10 @@ func GetRotationMatrix(a Axis, counter Direction) Matrix {
 	return ret
 }
 
+func (cube Cube) GetSize() uint {
+	return cube.n
+}
+
 // Performs a move on a cube by turning part of the
 // cube about an Axis in a particular direction
 func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
