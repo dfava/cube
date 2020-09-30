@@ -10,8 +10,7 @@ import (
 	"testing"
 )
 
-// Disabled for now.  TODO: Enable by renaming to Test...
-func testFromFile2(t *testing.T) {
+func TestFromFile2(t *testing.T) {
 	var fl Flat
 	fl.FromFile("cube2.txt")
 	fmt.Println(fl)
@@ -29,7 +28,7 @@ func TestFromFile3(t *testing.T) {
 	fmt.Println(cube)
 }
 
-func testCube2Flat2Cube(t *testing.T, sizes []uint) {
+func cube2Flat2Cube(t *testing.T, sizes []uint) {
 	for _, n := range sizes {
 		for _, shuffle := range [...]uint{0, 1, 2, 10, 13} {
 			var cube Cube
@@ -48,10 +47,9 @@ func testCube2Flat2Cube(t *testing.T, sizes []uint) {
 }
 
 func TestCube2Flat2CubeOdd(t *testing.T) {
-	testCube2Flat2Cube(t, []uint{3, 5, 7, 9})
+	cube2Flat2Cube(t, []uint{3, 5, 7, 9})
 }
 
-// Disabled for now. TODO: Enable by renaming to Test...
-func testCube2Flat2CubeEven(t *testing.T) {
-	testCube2Flat2Cube(t, []uint{2, 4, 6, 8})
+func TestCube2Flat2CubeEven(t *testing.T) {
+	cube2Flat2Cube(t, []uint{2, 4, 6, 8})
 }

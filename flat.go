@@ -84,9 +84,9 @@ const (
 
 func sign(x int) int {
 	if x < 0 {
-		return -1
+		return neg
 	}
-	return 1
+	return pos
 }
 
 type projection struct {
@@ -94,7 +94,7 @@ type projection struct {
 	offset [2]int
 	sign   [2]int
 	fun    [2]func(float64) float64
-	inv    [2]func(float64) float64
+	fname  [2]string
 }
 
 // Project down from a side of the cube (specified by an axis and a sign)
@@ -150,10 +150,10 @@ func project(n uint, axis Axis, sign bool) projection {
 	for _, idx := range [...]int{row, col} {
 		if proj.sign[idx] == neg {
 			proj.fun[idx] = math.Ceil
-			proj.inv[idx] = math.Floor
+			proj.fname[idx] = "Ceil"
 		} else {
 			proj.fun[idx] = math.Floor
-			proj.inv[idx] = math.Ceil
+			proj.fname[idx] = "Floor"
 		}
 	}
 	return proj
@@ -254,16 +254,14 @@ func (fl *Flat) FromFile(fname string) {
 	}
 }
 
-// TODO: Not working for cubes of even size
 func (fl Flat) ToCube() Cube {
+	debug := false
 	n := len(fl) / 3
+	extremity := n / 2
 
 	var cube Cube
 	cube.n = uint(n)
 	cube.cubis = make([]Cubi, int(math.Pow(float64(n), 3)-math.Pow(float64(n)-2, 3)))
-
-	extremity := n / 2
-	debug := false
 
 	preCube := make(map[Vec]CVec)
 	for r := 0; r < n*3; r++ {
@@ -320,8 +318,24 @@ func (fl Flat) ToCube() Cube {
 			pv[proj.axis[row]] = (r - proj.offset[row] - n/2) * proj.sign[row]
 			pv[proj.axis[col]] = (c - proj.offset[col] - n/2) * proj.sign[col]
 			if n%2 == 0 {
-				// TODO
+				rp := r - proj.offset[row]
+				cp := c - proj.offset[col]
+				if debug {
+					if pv[proj.axis[row]] == 0 {
+						fmt.Println("row:", rp, proj.axis[row], proj.sign[row], proj.fname[row])
+					}
+					if pv[proj.axis[col]] == 0 {
+						fmt.Println("col:", cp, proj.axis[col], proj.sign[col], proj.fname[col])
+					}
+				}
+				if rp >= n/2 {
+					pv[proj.axis[row]] += proj.sign[row]
+				}
+				if cp >= n/2 {
+					pv[proj.axis[col]] += proj.sign[col]
+				}
 			}
+
 			if debug {
 				fmt.Println(axis, polarity)
 				fmt.Println(pv, cv)
