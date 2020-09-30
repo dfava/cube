@@ -94,6 +94,7 @@ type projection struct {
 	offset [2]int
 	sign   [2]int
 	fun    [2]func(float64) float64
+	inv    [2]func(float64) float64
 }
 
 // Project down from a side of the cube (specified by an axis and a sign)
@@ -149,8 +150,10 @@ func project(n uint, axis Axis, sign bool) projection {
 	for _, idx := range [...]int{row, col} {
 		if proj.sign[idx] == neg {
 			proj.fun[idx] = math.Ceil
+			proj.inv[idx] = math.Floor
 		} else {
 			proj.fun[idx] = math.Floor
+			proj.inv[idx] = math.Ceil
 		}
 	}
 	return proj
@@ -166,22 +169,21 @@ func project(n uint, axis Axis, sign bool) projection {
 // populated, and we use the CVec to determine the string representation
 // the location's color.
 func (fl *Flat) PaintCubi(cubi Cubi, n uint) {
-	var offset float64
-	if n%2 == 0 {
-		offset = 0.5
-	}
-	sign := [3]float64{
-		float64(-1 * sign(cubi.pv[Xax])),
-		float64(-1 * sign(cubi.pv[Yax])),
-		float64(-1 * sign(cubi.pv[Zax]))}
-
 	for _, ax := range [...]Axis{Xax, Yax, Zax} {
 		if cubi.cv[ax] == 0 {
 			continue
 		}
 		proj := project(n, ax, cubi.cv[ax] > 0)
-		r := int(n/2) + proj.sign[row]*int(proj.fun[row](float64(cubi.pv[proj.axis[row]])+sign[proj.axis[row]]*offset)) + proj.offset[row]
-		c := int(n/2) + proj.sign[col]*int(proj.fun[col](float64(cubi.pv[proj.axis[col]])+sign[proj.axis[col]]*offset)) + proj.offset[col]
+		r := int(n/2) + proj.sign[row]*cubi.pv[proj.axis[row]] + proj.offset[row]
+		c := int(n/2) + proj.sign[col]*cubi.pv[proj.axis[col]] + proj.offset[col]
+		if n%2 == 0 {
+			signArray := [3]float64{
+				float64(sign(cubi.pv[Xax])),
+				float64(sign(cubi.pv[Yax])),
+				float64(sign(cubi.pv[Zax]))}
+			r += proj.sign[row] * int(proj.fun[row](-signArray[proj.axis[row]]*0.5))
+			c += proj.sign[col] * int(proj.fun[col](-signArray[proj.axis[col]]*0.5))
+		}
 		(*fl)[r][c] = cubi.cv[ax].Abs().String()
 	}
 }
@@ -261,6 +263,7 @@ func (fl Flat) ToCube() Cube {
 	cube.cubis = make([]Cubi, int(math.Pow(float64(n), 3)-math.Pow(float64(n)-2, 3)))
 
 	extremity := n / 2
+	debug := false
 
 	preCube := make(map[Vec]CVec)
 	for r := 0; r < n*3; r++ {
@@ -269,75 +272,81 @@ func (fl Flat) ToCube() Cube {
 			if fl[r][c] == " " || fl[r][c] == "" {
 				continue
 			}
-			//fmt.Println(r, c, fl[r][c])
-			var x, y, z int
-			var xc, yc, zc Color
+			if debug {
+				fmt.Println()
+				fmt.Println(r, c, fl[r][c])
+			}
+
+			var axis Axis
+			var polarity bool
+			var pv Vec
+			var cv CVec
+
 			if r < n {
 				// Size 5 (yellow)
-				//fmt.Println("yellow")
-				proj := project(uint(n), Zax, true)
-				x = (c - proj.offset[col] - n/2) * proj.sign[col]
-				y = (r - proj.offset[row] - n/2) * proj.sign[row]
-				z = extremity
-				zc = ToColor(fl[r][c])
+				axis = Zax
+				polarity = true
 			} else if r >= 2*n {
 				// Size w (white)
-				//fmt.Println("white")
-				proj := project(uint(n), Zax, false)
-				x = (c - proj.offset[col] - n/2) * proj.sign[col]
-				y = (r - proj.offset[row] - n/2) * proj.sign[row]
-				z = -extremity
-				zc = -ToColor(fl[r][c])
+				axis = Zax
+				polarity = false
 			} else {
 				// Could be one of sides 4 (red), 1 (green), 3 (orange), or 6 (blue)
 				if c < n {
 					// Size 4 (red)
-					//fmt.Println("red")
-					proj := project(uint(n), Xax, false)
-					x = -extremity
-					y = (c - proj.offset[col] - n/2) * proj.sign[col]
-					z = (r - proj.offset[row] - n/2) * proj.sign[row]
-					xc = -ToColor(fl[r][c])
+					axis = Xax
+					polarity = false
 				} else if c < 2*n {
 					// Size 1 (green)
-					//fmt.Println("green")
-					proj := project(uint(n), Yax, true)
-					x = (c - proj.offset[col] - n/2) * proj.sign[col]
-					y = extremity
-					z = (r - proj.offset[row] - n/2) * proj.sign[row]
-					yc = ToColor(fl[r][c])
+					axis = Yax
+					polarity = true
 				} else if c < 3*n {
 					// Size 3 (orange)
-					//fmt.Println("orange")
-					proj := project(uint(n), Xax, true)
-					x = extremity
-					y = (c - proj.offset[col] - n/2) * proj.sign[col]
-					z = (r - proj.offset[row] - n/2) * proj.sign[row]
-					xc = ToColor(fl[r][c])
+					axis = Xax
+					polarity = true
 				} else {
 					// Size 6 (blue)
-					//fmt.Println("blue")
-					proj := project(uint(n), Yax, false)
-					x = (c - proj.offset[col] - n/2) * proj.sign[col]
-					y = -extremity
-					z = (r - proj.offset[row] - n/2) * proj.sign[row]
-					yc = -ToColor(fl[r][c])
+					axis = Yax
+					polarity = false
 				}
 			}
-			//fmt.Println(x, y, z, xc, yc, zc)
-			cvec, ok := preCube[Vec{x, y, z}]
+			proj := project(uint(n), axis, polarity)
+			sign := -1
+			if polarity {
+				sign = 1
+			}
+			cv[axis] = Color(sign * int(ToColor(fl[r][c])))
+			pv[axis] = sign * extremity
+			pv[proj.axis[row]] = (r - proj.offset[row] - n/2) * proj.sign[row]
+			pv[proj.axis[col]] = (c - proj.offset[col] - n/2) * proj.sign[col]
+			if n%2 == 0 {
+				// TODO
+			}
+			if debug {
+				fmt.Println(axis, polarity)
+				fmt.Println(pv, cv)
+			}
+			cvec, ok := preCube[pv]
 			if !ok {
-				preCube[Vec{x, y, z}] = CVec{xc, yc, zc}
+				if debug {
+					fmt.Println("Adding", cv, "to", pv)
+				}
+				preCube[pv] = cv
 			} else {
-				preCube[Vec{x, y, z}] = cvec.or(CVec{xc, yc, zc})
+				if debug {
+					fmt.Println("OR'ing", cv, "to", pv)
+				}
+				preCube[pv] = cvec.or(cv)
 			}
 		}
-		ncubi := 0
-		for pvec, cvec := range preCube {
-			//fmt.Println(pvec, cvec)
-			cube.cubis[ncubi] = Cubi{cv: cvec, pv: pvec}
-			ncubi += 1
+	}
+	ncubi := 0
+	for pvec, cvec := range preCube {
+		if debug {
+			fmt.Println(pvec, cvec)
 		}
+		cube.cubis[ncubi] = Cubi{cv: cvec, pv: pvec}
+		ncubi += 1
 	}
 
 	return cube
