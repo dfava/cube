@@ -103,7 +103,8 @@ type projection struct {
 // needed to calculate the projection
 func project(n uint, axis Axis, sign bool) projection {
 	var proj projection
-	if axis == Xax {
+	switch axis {
+	case Xax:
 		proj.axis[row] = Zax
 		proj.axis[col] = Yax
 		if sign {
@@ -117,7 +118,7 @@ func project(n uint, axis Axis, sign bool) projection {
 			proj.sign[row] = neg
 			proj.sign[col] = pos
 		}
-	} else if axis == Yax {
+	case Yax:
 		proj.axis[row] = Zax
 		proj.axis[col] = Xax
 		if sign {
@@ -131,7 +132,7 @@ func project(n uint, axis Axis, sign bool) projection {
 			proj.sign[row] = neg
 			proj.sign[col] = neg
 		}
-	} else {
+	case Zax:
 		proj.axis[row] = Yax
 		proj.axis[col] = Xax
 		if sign {

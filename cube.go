@@ -132,7 +132,8 @@ func (dir Direction) String() string {
 // either counter-clockwise or clockwise
 func GetRotationMatrix(a Axis, counter Direction) Matrix {
 	var ret Matrix
-	if a == Xax {
+	switch a {
+	case Xax:
 		if counter {
 			ret[0][0] = 1
 			ret[1][2] = 1
@@ -142,7 +143,7 @@ func GetRotationMatrix(a Axis, counter Direction) Matrix {
 			ret[1][2] = -1
 			ret[2][1] = 1
 		}
-	} else if a == Yax {
+	case Yax:
 		if counter {
 			ret[0][2] = -1
 			ret[1][1] = 1
@@ -152,7 +153,7 @@ func GetRotationMatrix(a Axis, counter Direction) Matrix {
 			ret[1][1] = 1
 			ret[2][0] = -1
 		}
-	} else if a == Zax {
+	case Zax:
 		if counter {
 			ret[0][1] = 1
 			ret[1][0] = -1
@@ -360,20 +361,21 @@ func (cube *Cube) IsCanonical() bool {
 	if cube.n%2 == 0 { // Only odd sized cubes can be canonical
 		return false
 	}
-	canon := true
 	extremity := int(cube.n / 2)
+	canon := true
 	for _, cubi := range cube.cubis {
-		if (cubi.pv == Vec{-extremity, 0, 0}) {
+		switch cubi.pv {
+		case Vec{-extremity, 0, 0}:
 			canon = canon && (cubi.cv[Xax] == -red)
-		} else if (cubi.pv == Vec{extremity, 0, 0}) {
+		case Vec{extremity, 0, 0}:
 			canon = canon && (cubi.cv[Xax] == orange)
-		} else if (cubi.pv == Vec{0, -extremity, 0}) {
+		case Vec{0, -extremity, 0}:
 			canon = canon && (cubi.cv[Yax] == -blue)
-		} else if (cubi.pv == Vec{0, extremity, 0}) {
+		case Vec{0, extremity, 0}:
 			canon = canon && (cubi.cv[Yax] == green)
-		} else if (cubi.pv == Vec{0, 0, -extremity}) {
+		case Vec{0, 0, -extremity}:
 			canon = canon && (cubi.cv[Zax] == -white)
-		} else if (cubi.pv == Vec{0, 0, extremity}) {
+		case Vec{0, 0, extremity}:
 			canon = canon && (cubi.cv[Zax] == yellow)
 		}
 	}
