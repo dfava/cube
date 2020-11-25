@@ -5,6 +5,7 @@
 package cube
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 )
@@ -48,8 +49,12 @@ func (c Color) String() string {
 
 var stringToColor map[string]Color
 
-func ToColor(color string) Color {
-	return stringToColor[color]
+func ParseColor(str string) (Color, error) {
+	c, ok := stringToColor[str]
+	if !ok {
+		return c, fmt.Errorf("ParseColor %s", str)
+	}
+	return c, nil
 }
 
 type Vec [3]int       // a vector in 3D

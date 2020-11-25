@@ -255,7 +255,7 @@ func (fl *Flat) FromFile(fname string) {
 	}
 }
 
-func (fl Flat) ToCube() Cube {
+func (fl Flat) Cube() Cube {
 	debug := false
 	n := len(fl) / 3
 	extremity := n / 2
@@ -314,7 +314,7 @@ func (fl Flat) ToCube() Cube {
 			if polarity {
 				sign = 1
 			}
-			cv[axis] = Color(sign * int(ToColor(fl[r][c])))
+			cv[axis] = Color(sign * func() int { v, _ := ParseColor(fl[r][c]); return int(v) }())
 			pv[axis] = sign * extremity
 			pv[proj.axis[row]] = (r - proj.offset[row] - n/2) * proj.sign[row]
 			pv[proj.axis[col]] = (c - proj.offset[col] - n/2) * proj.sign[col]

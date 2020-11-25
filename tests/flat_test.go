@@ -14,7 +14,7 @@ func TestFromFile2(t *testing.T) {
 	var fl Flat
 	fl.FromFile("cube2.txt")
 	fmt.Println(fl)
-	cube := fl.ToCube()
+	cube := fl.Cube()
 	fmt.Println()
 	fmt.Println(cube)
 }
@@ -23,7 +23,7 @@ func TestFromFile3(t *testing.T) {
 	var fl Flat
 	fl.FromFile("cube3.txt")
 	fmt.Println(fl)
-	cube := fl.ToCube()
+	cube := fl.Cube()
 	fmt.Println()
 	fmt.Println(cube)
 }
@@ -37,7 +37,7 @@ func cube2Flat2Cube(t *testing.T, sizes []uint) {
 			var fl Flat
 			fl.PaintCube(cube)
 			fmt.Println(fl)
-			var other = fl.ToCube()
+			var other = fl.Cube()
 			fmt.Println(other)
 			if cube.String() != other.String() {
 				t.Errorf("flattening and reconstructing failed! n=%d", n)
