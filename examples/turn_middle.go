@@ -9,26 +9,24 @@ import (
 	. "github.com/dfava/cube"
 )
 
-func swap_top_corners() {
+// Turn middle cubi at (0,1,1) so that the green and the yellow are reversed
+func turn_middle() {
 	//PrintInColors(false)
 	var cb Cube
 	cb.Init(3)
 	fmt.Println(cb)
 	fmt.Println()
 
-	// Swap cubi (1,1,1) with cubi (-1,1,1)
-	cb = cb.Turn(Xax, 1, Counterclock)
+	// Turn
+	cb = cb.Turn(Xax, 0, Counterclock)
 	cb = cb.Turn(Zax, -1, Counterclock)
-	cb = cb.Turn(Xax, 1, Clock)
-
-	cb = cb.Turn(Xax, -1, Counterclock)
+	cb = cb.Turn(Zax, -1, Counterclock)
+	cb = cb.Turn(Xax, 0, Clock)
+	// Notice that these next four moves are a commutator!
 	cb = cb.Turn(Zax, -1, Clock)
-	cb = cb.Turn(Xax, -1, Clock)
-
-	cb = cb.Turn(Xax, 1, Counterclock)
+	cb = cb.Turn(Xax, 0, Counterclock)
 	cb = cb.Turn(Zax, -1, Counterclock)
-	cb = cb.Turn(Xax, 1, Clock)
-
+	cb = cb.Turn(Xax, 0, Clock)
 	//fmt.Println(cb)
 	//fmt.Println()
 
@@ -38,29 +36,25 @@ func swap_top_corners() {
 	//fmt.Println(cb)
 	//fmt.Println()
 
-	// Reverse swap
-	cb = cb.Turn(Xax, 1, Counterclock)
+	// Reverse turn
+	cb = cb.Turn(Xax, 0, Counterclock)
 	cb = cb.Turn(Zax, -1, Clock)
-	cb = cb.Turn(Xax, 1, Clock)
-
-	cb = cb.Turn(Xax, -1, Counterclock)
+	cb = cb.Turn(Xax, 0, Clock)
 	cb = cb.Turn(Zax, -1, Counterclock)
-	cb = cb.Turn(Xax, -1, Clock)
-
-	cb = cb.Turn(Xax, 1, Counterclock)
+	cb = cb.Turn(Xax, 0, Counterclock)
 	cb = cb.Turn(Zax, -1, Clock)
-	cb = cb.Turn(Xax, 1, Clock)
-
+	cb = cb.Turn(Zax, -1, Clock)
+	cb = cb.Turn(Xax, 0, Clock)
 	//fmt.Println(cb)
 	//fmt.Println()
 
-	//
 	cb = cb.Turn(Zax, 1, Clock)
 	cb = cb.Turn(Zax, 1, Clock)
 	fmt.Println(cb)
 	fmt.Println()
+
 }
 
 func main() {
-	swap_top_corners()
+	turn_middle()
 }
