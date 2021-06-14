@@ -9,12 +9,9 @@ import (
 	. "github.com/dfava/cube"
 )
 
-func swap_top_corners() {
-	//PrintInColors(false)
-	var cb Cube
-	cb.Init(3)
-	fmt.Println(cb)
-	fmt.Println()
+func swap_top_corners(cb Cube) Cube {
+	//fmt.Println(cb)
+	//fmt.Println()
 
 	// Swap cubi (1,1,1) with cubi (-1,1,1)
 	cb = cb.Turn(Xax, 1, Counterclock)
@@ -57,10 +54,20 @@ func swap_top_corners() {
 	//
 	cb = cb.Turn(Zax, 1, Clock)
 	cb = cb.Turn(Zax, 1, Clock)
-	fmt.Println(cb)
-	fmt.Println()
+	//fmt.Println(cb)
+	//fmt.Println()
+
+	return cb
 }
 
 func main() {
-	swap_top_corners()
+	//PrintInColors(false)
+	var cb Cube
+	cb.Init(3)
+	fmt.Println(cb)
+	fmt.Println()
+
+	cb = swap_top_corners(cb)
+	fmt.Println(cb)
+	fmt.Println()
 }
