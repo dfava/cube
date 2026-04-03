@@ -4,10 +4,9 @@
 package internal
 
 import (
+	"math"
 	"math/rand"
 )
-
-var printInColors bool
 
 type vec [3]int       // a vector in 3D
 type cVec [3]Color    // a "color vector
@@ -55,6 +54,7 @@ func New(n uint) Cube {
 		panic("n must be greater than 1")
 	}
 	ret := Cube{n: n}
+	ret.cubis = make([]cubi, int(math.Pow(float64(n), 3)-math.Pow(float64(n)-2, 3)))
 	ret.Reset()
 	return ret
 }
@@ -287,8 +287,4 @@ func (cube *Cube) IsCanonical() bool {
 		}
 	}
 	return canon
-}
-
-func init() {
-	rand.Seed(42) // Pseudo random
 }

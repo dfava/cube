@@ -5,6 +5,8 @@ package internal
 
 import "fmt"
 
+var printInColors bool
+
 type Color int
 
 const (
@@ -62,4 +64,8 @@ func ParseColor(str string) (Color, error) {
 		return c, fmt.Errorf("ParseColor %s", str)
 	}
 	return c, nil
+}
+
+func PrintInColors(b bool) {
+	printInColors = b
 }
