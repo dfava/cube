@@ -242,7 +242,7 @@ func (cube *Cube) Shuffle(times uint) {
 	}
 }
 
-func (cube *Cube) IsSolved() bool {
+func (cube Cube) IsSolved() bool {
 	// We could do with [3][2]Color, I'm wasting a bit of memory to simplify
 	// the algorithm:
 	// Signs -1 and 1 map to array indexes 0 and 2 as opposed to 0 and 1
@@ -264,26 +264,26 @@ func (cube *Cube) IsSolved() bool {
 	return true
 }
 
-func (cube *Cube) IsCanonical() bool {
+func (cube Cube) IsCanonical() bool {
 	if cube.n%2 == 0 { // Only odd sized cubes can be canonical
 		return false
 	}
 	extremity := int(cube.n / 2)
 	canon := true
-	for _, cubi := range cube.cubis {
-		switch cubi.pv {
+	for _, cbi := range cube.cubis {
+		switch cbi.pv {
 		case vec{-extremity, 0, 0}:
-			canon = canon && (cubi.cv[Xax] == -red)
+			canon = canon && (cbi.cv[Xax] == -red)
 		case vec{extremity, 0, 0}:
-			canon = canon && (cubi.cv[Xax] == orange)
+			canon = canon && (cbi.cv[Xax] == orange)
 		case vec{0, -extremity, 0}:
-			canon = canon && (cubi.cv[Yax] == -blue)
+			canon = canon && (cbi.cv[Yax] == -blue)
 		case vec{0, extremity, 0}:
-			canon = canon && (cubi.cv[Yax] == green)
+			canon = canon && (cbi.cv[Yax] == green)
 		case vec{0, 0, -extremity}:
-			canon = canon && (cubi.cv[Zax] == -white)
+			canon = canon && (cbi.cv[Zax] == -white)
 		case vec{0, 0, extremity}:
-			canon = canon && (cubi.cv[Zax] == yellow)
+			canon = canon && (cbi.cv[Zax] == yellow)
 		}
 	}
 	return canon

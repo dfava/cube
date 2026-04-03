@@ -81,7 +81,7 @@ const (
 	pos = 1
 )
 
-func sign(x int) int {
+func getSign(x int) int {
 	if x < 0 {
 		return neg
 	}
@@ -178,9 +178,9 @@ func (fl *Flat) PaintCubi(cubi cubi, n uint) {
 		c := int(n/2) + proj.sign[col]*cubi.pv[proj.axis[col]] + proj.offset[col]
 		if n%2 == 0 {
 			signArray := [3]float64{
-				float64(sign(cubi.pv[Xax])),
-				float64(sign(cubi.pv[Yax])),
-				float64(sign(cubi.pv[Zax]))}
+				float64(getSign(cubi.pv[Xax])),
+				float64(getSign(cubi.pv[Yax])),
+				float64(getSign(cubi.pv[Zax]))}
 			r += proj.sign[row] * int(proj.fun[row](-signArray[proj.axis[row]]*0.5))
 			c += proj.sign[col] * int(proj.fun[col](-signArray[proj.axis[col]]*0.5))
 		}

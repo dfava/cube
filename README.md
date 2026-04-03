@@ -21,8 +21,7 @@ import (
 )
 
 func main() {
-	var cb Cube
-	cb.Init(3)
+	cb := cube.New(3)
 	fmt.Println(cb)
 }
 ```
