@@ -1,61 +1,14 @@
 // Copyright 2020 Daniel S. Fava. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-
-package cube
+package internal
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 )
 
-type Color int
-
 var printInColors bool
-
-const (
-	zero   Color = iota // the "zero color"
-	green               // green
-	white               // white
-	orange              // orange
-	red                 // red
-	yellow              // yellow
-	blue                // blue
-)
-
-func (c Color) Abs() Color {
-	if c < 0 {
-		return -c
-	}
-	return c
-}
-
-// using ANSI escape codes for colors
-func (c Color) String() string {
-	var names [7]string
-	if printInColors {
-		names = [...]string{" ", "\033[32mg\033[0m", "\033[37mw\033[0m", "\033[35mo\033[0m", "\033[31mr\033[0m", "\033[33my\033[0m", "\033[34mb\033[0m"} // no orange, using magenta instead
-	} else {
-		names = [...]string{" ", "g", "w", "o", "r", "y", "b"}
-	}
-	var str string
-	if c < 0 {
-		str = "-"
-		c = -c
-	}
-	return str + names[c]
-}
-
-var stringToColor map[string]Color
-
-func ParseColor(str string) (Color, error) {
-	c, ok := stringToColor[str]
-	if !ok {
-		return c, fmt.Errorf("ParseColor %s", str)
-	}
-	return c, nil
-}
 
 type Vec [3]int       // a vector in 3D
 type CVec [3]Color    // a "color vector
@@ -104,72 +57,6 @@ func (cube Cube) String() string {
 	var fl Flat
 	fl.PaintCube(cube)
 	return fl.String()
-}
-
-type Axis uint
-
-const (
-	Xax Axis = iota
-	Yax
-	Zax
-)
-
-func (ax Axis) String() string {
-	names := [...]string{"x", "y", "z"}
-	return names[ax]
-}
-
-type Direction bool
-
-const (
-	Clock        = false
-	Counterclock = true
-)
-
-func (dir Direction) String() string {
-	if dir {
-		return "counterclockwise"
-	}
-	return "clockwise"
-}
-
-// Returns a 90 degree rotation matrix about an axis,
-// either counter-clockwise or clockwise
-func GetRotationMatrix(a Axis, counter Direction) Matrix {
-	var ret Matrix
-	switch a {
-	case Xax:
-		if counter {
-			ret[0][0] = 1
-			ret[1][2] = 1
-			ret[2][1] = -1
-		} else {
-			ret[0][0] = 1
-			ret[1][2] = -1
-			ret[2][1] = 1
-		}
-	case Yax:
-		if counter {
-			ret[0][2] = -1
-			ret[1][1] = 1
-			ret[2][0] = 1
-		} else {
-			ret[0][2] = 1
-			ret[1][1] = 1
-			ret[2][0] = -1
-		}
-	case Zax:
-		if counter {
-			ret[0][1] = 1
-			ret[1][0] = -1
-			ret[2][2] = 1
-		} else {
-			ret[0][1] = -1
-			ret[1][0] = 1
-			ret[2][2] = 1
-		}
-	}
-	return ret
 }
 
 func (cube Cube) GetSize() uint {

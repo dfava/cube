@@ -5,8 +5,8 @@
 package cube_test
 
 import (
-	//"fmt"
-	. "github.com/dfava/cube"
+	. "github.com/dfava/cube/internal"
+
 	"math/rand"
 	"testing"
 )

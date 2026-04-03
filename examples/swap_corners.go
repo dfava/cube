@@ -6,7 +6,8 @@ package main
 
 import (
 	"fmt"
-	. "github.com/dfava/cube"
+
+	. "github.com/dfava/cube/internal"
 )
 
 func swap_top_corners(cb Cube) Cube {

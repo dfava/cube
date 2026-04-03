@@ -6,7 +6,8 @@ package main
 
 import (
 	"fmt"
-	. "github.com/dfava/cube"
+
+	. "github.com/dfava/cube/internal"
 )
 
 // The commutator of g and h is [g,h]:

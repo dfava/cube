@@ -6,7 +6,9 @@ package cube_test
 
 import (
 	"fmt"
-	. "github.com/dfava/cube"
+
+	. "github.com/dfava/cube/internal"
+
 	"testing"
 	"time"
 )

@@ -1,0 +1,8 @@
+/bin/
+/dist/
+*.out
+*.test
+
+.cache/
+.idea/
+.check.*

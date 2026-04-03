@@ -6,7 +6,8 @@ package main
 
 import (
 	"fmt"
-	. "github.com/dfava/cube"
+
+	. "github.com/dfava/cube/internal"
 )
 
 // Turn middle cubi at (0,1,1) so that the green and the yellow are reversed
