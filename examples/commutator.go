@@ -25,8 +25,7 @@ import (
 // Note that [g,h] is closer to the identify than g.h
 func main() {
 	//PrintInColors(false)
-	var cb Cube
-	cb.Init(3)
+	cb := New(3)
 	fmt.Println(cb)
 	fmt.Println()
 
@@ -36,7 +35,7 @@ func main() {
 	fmt.Println(cb)
 	fmt.Println()
 
-	cb.Init(3)
+	cb.Reset()
 
 	cb = cb.Turn(Xax, -1, Clock) // g^(-1)
 	//fmt.Println(cb)

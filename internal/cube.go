@@ -4,7 +4,6 @@
 package internal
 
 import (
-	"math"
 	"math/rand"
 )
 
@@ -52,111 +51,37 @@ type Cube struct {
 	cubis []Cubi
 }
 
-// A string representation of a Rubik's cube
-func (cube Cube) String() string {
-	var fl Flat
-	fl.PaintCube(cube)
-	return fl.String()
+func New(n uint) Cube {
+	if n <= 1 {
+		panic("n must be greater than 1")
+	}
+	ret := Cube{n: n}
+	ret.Reset()
+	return ret
 }
 
-func (cube Cube) GetSize() uint {
-	return cube.n
-}
-
-// Performs a move on a cube by turning part of the
-// cube about an Axis in a particular direction
-func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
-	ret := cube.New()
-	m := GetRotationMatrix(a, counter)
-	for cube_idx := range cube.cubis {
-		if cube.cubis[cube_idx].pv[a] == idx {
-			// We rotate via matrix multiplication
-			ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
-		}
+// A copy-constructor
+func (cube Cube) Copy() Cube {
+	var ret Cube
+	ret.n = cube.n
+	ret.cubis = make([]Cubi, len(cube.cubis))
+	for idx := range cube.cubis {
+		ret.cubis[idx] = cube.cubis[idx]
 	}
 	return ret
 }
 
-// Perform all moves on a cube
-func (cube Cube) GetAllTurns() []Cube {
-	var ret []Cube
-	for _, ax := range [...]Axis{Xax, Yax, Zax} {
-		for idx := -int(cube.n) / 2; idx <= int(cube.n)/2; idx++ {
-			for _, dir := range [...]Direction{Counterclock, Clock} {
-				if cube.n%2 == 0 && idx == 0 {
-					continue
-				}
-				newCube := cube.Turn(ax, idx, dir)
-				if cube.n%2 == 1 && idx == 0 {
-					// Preserves a canonical cube
-					newCube = newCube.Rotate(ax, !dir)
-				}
-				ret = append(ret, newCube)
-			}
-		}
-	}
-	return ret
-}
-
-// Rotate the whole cube in 3 dimensions
-func (cube Cube) Rotate(a Axis, counter Direction) Cube {
-	ret := cube.New()
-	m := GetRotationMatrix(a, counter)
-	for cube_idx := range cube.cubis {
-		// We rotate via matrix multiplication
-		ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
-	}
-	return ret
-}
-
-// Perform all rotations on a cube
-// There are 24 equivalence classes (rotations) of a cube.
-func (cube Cube) GetAllRotations() []Cube {
-	var ret []Cube
-
-	current := cube
-	explored := make(map[string]Cube)
-	var toExplore []Cube
-
-	for {
-		explored[current.String()] = current
-
-		for _, ax := range [...]Axis{Xax, Yax, Zax} {
-			for _, dir := range [...]Direction{Counterclock, Clock} {
-				other := current.Rotate(ax, dir)
-				if _, in := explored[other.String()]; !in {
-					toExplore = append(toExplore, other)
-				}
-			}
-		}
-
-		if len(toExplore) == 0 {
-			// Nothing more to explore
-			for k := range explored {
-				ret = append(ret, explored[k])
-			}
-			return ret
-		}
-
-		current = toExplore[0]
-		toExplore = toExplore[1:len(toExplore)]
-	}
-}
-
-// Returns a cube of size n^3 in its initial configuration.
-// Handles cubes of n>2.  Cannot handle the trivial 1x1 cube
-//
-// Initializes the cube to:
+// Resets the cube to:
 // green  at the center   (y>0)
 // blue   to the back     (y<0)
 // red    to the left     (x<0)
 // orange to the right    (x>0)
 // yellow upward          (z>0)
 // white  downward        (z<0)
-func (cube *Cube) Init(n uint) {
-	(*cube).n = n
-	(*cube).cubis = make([]Cubi, int(math.Pow(float64(n), 3)-math.Pow(float64(n)-2, 3)))
-
+//
+// Cannot handle the trivial 1x1 cube
+func (cube *Cube) Reset() {
+	n := cube.n
 	ncubi := 0
 	for x := -int(n) / 2; x <= int(n)/2; x++ {
 		if x == 0 && n%2 == 0 {
@@ -201,6 +126,97 @@ func (cube *Cube) Init(n uint) {
 				ncubi += 1
 			}
 		}
+	}
+}
+
+// A string representation of a Rubik's cube
+func (cube Cube) String() string {
+	var fl Flat
+	fl.PaintCube(cube)
+	return fl.String()
+}
+
+func (cube Cube) GetSize() uint {
+	return cube.n
+}
+
+// Performs a move on a cube by turning part of the
+// cube about an Axis in a particular direction
+func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
+	ret := cube.Copy()
+	m := GetRotationMatrix(a, counter)
+	for cube_idx := range cube.cubis {
+		if cube.cubis[cube_idx].pv[a] == idx {
+			// We rotate via matrix multiplication
+			ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
+		}
+	}
+	return ret
+}
+
+// Perform all moves on a cube
+func (cube Cube) GetAllTurns() []Cube {
+	var ret []Cube
+	for _, ax := range [...]Axis{Xax, Yax, Zax} {
+		for idx := -int(cube.n) / 2; idx <= int(cube.n)/2; idx++ {
+			for _, dir := range [...]Direction{Counterclock, Clock} {
+				if cube.n%2 == 0 && idx == 0 {
+					continue
+				}
+				newCube := cube.Turn(ax, idx, dir)
+				if cube.n%2 == 1 && idx == 0 {
+					// Preserves a canonical cube
+					newCube = newCube.Rotate(ax, !dir)
+				}
+				ret = append(ret, newCube)
+			}
+		}
+	}
+	return ret
+}
+
+// Rotate the whole cube in 3 dimensions
+func (cube Cube) Rotate(a Axis, counter Direction) Cube {
+	ret := cube.Copy()
+	m := GetRotationMatrix(a, counter)
+	for cube_idx := range cube.cubis {
+		// We rotate via matrix multiplication
+		ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
+	}
+	return ret
+}
+
+// Perform all rotations on a cube
+// There are 24 equivalence classes (rotations) of a cube.
+func (cube Cube) GetAllRotations() []Cube {
+	var ret []Cube
+
+	current := cube
+	explored := make(map[string]Cube)
+	var toExplore []Cube
+
+	for {
+		explored[current.String()] = current
+
+		for _, ax := range [...]Axis{Xax, Yax, Zax} {
+			for _, dir := range [...]Direction{Counterclock, Clock} {
+				other := current.Rotate(ax, dir)
+				if _, in := explored[other.String()]; !in {
+					toExplore = append(toExplore, other)
+				}
+			}
+		}
+
+		if len(toExplore) == 0 {
+			// Nothing more to explore
+			for k := range explored {
+				ret = append(ret, explored[k])
+			}
+			return ret
+		}
+
+		current = toExplore[0]
+		toExplore = toExplore[1:len(toExplore)]
 	}
 }
 
@@ -272,17 +288,6 @@ func (cube *Cube) IsCanonical() bool {
 		}
 	}
 	return canon
-}
-
-// A copy-constructor
-func (cube Cube) New() Cube {
-	var ret Cube
-	ret.n = cube.n
-	ret.cubis = make([]Cubi, len(cube.cubis))
-	for idx := range cube.cubis {
-		ret.cubis[idx] = cube.cubis[idx]
-	}
-	return ret
 }
 
 func init() {

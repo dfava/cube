@@ -50,8 +50,7 @@ func turn_middle(cb Cube) Cube {
 
 func main() {
 	//PrintInColors(false)
-	var cb Cube
-	cb.Init(3)
+	cb := New(3)
 	fmt.Println(cb)
 	fmt.Println()
 

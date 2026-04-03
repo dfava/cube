@@ -17,8 +17,7 @@ func main() {
 	fmt.Println()
 	var n uint
 	n = 3
-	var cb Cube
-	cb.Init(n)
+	cb := New(n)
 	var c2 Cube
 	for _, ax := range [...]Axis{Xax, Yax, Zax} {
 		for idx := -int(n) / 2; idx <= int(n)/2; idx++ {

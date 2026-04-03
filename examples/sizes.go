@@ -13,17 +13,16 @@ import (
 func main() {
 	//PrintInColors(false)
 	fmt.Println("Cubes of different sizes")
-	var cb Cube
-	cb.Init(2)
+	cb := New(2)
 	fmt.Println(cb)
 	fmt.Println()
-	cb.Init(3)
+	cb = New(3)
 	fmt.Println(cb)
 	fmt.Println()
-	cb.Init(4)
+	cb = New(4)
 	fmt.Println(cb)
 	fmt.Println()
-	cb.Init(5)
+	cb = New(5)
 	fmt.Println(cb)
 	fmt.Println()
 }

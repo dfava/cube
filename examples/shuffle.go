@@ -13,8 +13,7 @@ import (
 // Perform moves at random, starting from the initial configuration
 func main() {
 	//PrintInColors(false)
-	var cb Cube
-	cb.Init(3)
+	cb := New(3)
 	fmt.Print("shuffle: performing moves at random, ")
 	fmt.Println("starting from the initial configuration")
 	fmt.Println(cb)

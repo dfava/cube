@@ -14,8 +14,7 @@ import (
 func TestShuffleCanonical(t *testing.T) {
 	for _, n := range []uint{3, 5, 7, 9} {
 		for _, shuffle := range [...]uint{0, 1, 2, 10, 20, 100} {
-			var cube Cube
-			cube.Init(n)
+			cube := New(n)
 			cube.Shuffle(shuffle)
 			if !cube.IsCanonical() {
 				t.Errorf("Cube not canonical! n=%d", n)
@@ -51,10 +50,8 @@ func TestTurn(t *testing.T) {
 			}
 			perms = append(perms, turnOperands{ax: ax, idx: idx, dir: dir})
 		}
-		var cube Cube
-		cube.Init(n)
-		var final Cube
-		final.Init(n)
+		cube := New(n)
+		final := New(n)
 		// Perform turns
 		for num_perms = 0; num_perms < int(times); num_perms += 1 {
 			//fmt.Println(perms[num_perms])

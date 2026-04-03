@@ -33,8 +33,7 @@ func TestFromFile3(t *testing.T) {
 func cube2Flat2Cube(t *testing.T, sizes []uint) {
 	for _, n := range sizes {
 		for _, shuffle := range [...]uint{0, 1, 2, 10, 13} {
-			var cube Cube
-			cube.Init(n)
+			cube := New(n)
 			cube.Shuffle(shuffle)
 			var fl Flat
 			fl.PaintCube(cube)

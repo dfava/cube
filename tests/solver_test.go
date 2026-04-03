@@ -16,11 +16,9 @@ import (
 func testSolver(t *testing.T, sizes []uint) {
 	for _, n := range sizes {
 		for _, shuffle := range [...]uint{0, 1, 2, 3, 4, 5, 6, 7, 8, 9} {
-			var cube Cube
-			cube.Init(n)
+			cube := New(n)
 			cube.Shuffle(shuffle)
-			var init Cube
-			init.Init(n)
+			init := New(n)
 			fmt.Printf("n=%d, shuffle=%d\n", n, shuffle)
 			fmt.Println("Starting position:")
 			fmt.Println(cube)
