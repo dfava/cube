@@ -9,12 +9,12 @@ import (
 
 var printInColors bool
 
-type Vec [3]int       // a vector in 3D
-type CVec [3]Color    // a "color vector
-type Matrix [3][3]int // a matrix
+type vec [3]int       // a vector in 3D
+type cVec [3]Color    // a "color vector
+type matrix [3][3]int // a matrix
 
-func (a CVec) or(b CVec) CVec {
-	var c CVec
+func (a cVec) or(b cVec) cVec {
+	var c cVec
 	or := func(a Color, b Color) Color {
 		if a == zero {
 			return b
@@ -28,12 +28,12 @@ func (a CVec) or(b CVec) CVec {
 	return c
 }
 
-// Multiplying a matrix by a Cubi
+// Multiplying a matrix by a cubi
 //
 // The function multiplies the matrix by the position vector and
 // it multiplies the matrix by the color vector
-func (m *Matrix) Mult(cubi Cubi) Cubi {
-	var ret Cubi
+func (m *matrix) mult(cubi cubi) cubi {
+	var ret cubi
 	for i := 0; i <= 2; i++ {
 		ret.pv[i] = m[i][0]*cubi.pv[0] + m[i][1]*cubi.pv[1] + m[i][2]*cubi.pv[2]
 		ret.cv[i] = Color(m[i][0]*int(cubi.cv[0]) + m[i][1]*int(cubi.cv[1]) + m[i][2]*int(cubi.cv[2]))
@@ -41,14 +41,14 @@ func (m *Matrix) Mult(cubi Cubi) Cubi {
 	return ret
 }
 
-type Cubi struct {
-	pv Vec  // position vector
-	cv CVec // color vector
+type cubi struct {
+	pv vec  // position vector
+	cv cVec // color vector
 }
 
 type Cube struct {
 	n     uint
-	cubis []Cubi
+	cubis []cubi
 }
 
 func New(n uint) Cube {
@@ -64,7 +64,7 @@ func New(n uint) Cube {
 func (cube Cube) Copy() Cube {
 	var ret Cube
 	ret.n = cube.n
-	ret.cubis = make([]Cubi, len(cube.cubis))
+	ret.cubis = make([]cubi, len(cube.cubis))
 	for idx := range cube.cubis {
 		ret.cubis[idx] = cube.cubis[idx]
 	}
@@ -122,7 +122,7 @@ func (cube *Cube) Reset() {
 				} else if z == -extremity {
 					zc = -white
 				}
-				cube.cubis[ncubi] = Cubi{cv: CVec{xc, yc, zc}, pv: Vec{x, y, z}}
+				cube.cubis[ncubi] = cubi{cv: cVec{xc, yc, zc}, pv: vec{x, y, z}}
 				ncubi += 1
 			}
 		}
@@ -148,7 +148,7 @@ func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
 	for cube_idx := range cube.cubis {
 		if cube.cubis[cube_idx].pv[a] == idx {
 			// We rotate via matrix multiplication
-			ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
+			ret.cubis[cube_idx] = m.mult(cube.cubis[cube_idx])
 		}
 	}
 	return ret
@@ -181,7 +181,7 @@ func (cube Cube) Rotate(a Axis, counter Direction) Cube {
 	m := GetRotationMatrix(a, counter)
 	for cube_idx := range cube.cubis {
 		// We rotate via matrix multiplication
-		ret.cubis[cube_idx] = m.Mult(cube.cubis[cube_idx])
+		ret.cubis[cube_idx] = m.mult(cube.cubis[cube_idx])
 	}
 	return ret
 }
@@ -273,17 +273,17 @@ func (cube *Cube) IsCanonical() bool {
 	canon := true
 	for _, cubi := range cube.cubis {
 		switch cubi.pv {
-		case Vec{-extremity, 0, 0}:
+		case vec{-extremity, 0, 0}:
 			canon = canon && (cubi.cv[Xax] == -red)
-		case Vec{extremity, 0, 0}:
+		case vec{extremity, 0, 0}:
 			canon = canon && (cubi.cv[Xax] == orange)
-		case Vec{0, -extremity, 0}:
+		case vec{0, -extremity, 0}:
 			canon = canon && (cubi.cv[Yax] == -blue)
-		case Vec{0, extremity, 0}:
+		case vec{0, extremity, 0}:
 			canon = canon && (cubi.cv[Yax] == green)
-		case Vec{0, 0, -extremity}:
+		case vec{0, 0, -extremity}:
 			canon = canon && (cubi.cv[Zax] == -white)
-		case Vec{0, 0, extremity}:
+		case vec{0, 0, extremity}:
 			canon = canon && (cubi.cv[Zax] == yellow)
 		}
 	}

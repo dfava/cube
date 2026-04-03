@@ -159,16 +159,16 @@ func project(n uint, axis Axis, sign bool) projection {
 	return proj
 }
 
-// Populate a Flat structure given a Cubi.
+// Populate a Flat structure given a cubi.
 //
-// A Cubi is composed of a location in space (captured by a Vec) and
-// of a description on how to paint that location (captured by a CVec,
+// A cubi is composed of a location in space (captured by a vec) and
+// of a description on how to paint that location (captured by a cVec,
 // aka color vector).
 //
-// We use the Vec and CVec to find the indices in Flat that need to be
-// populated, and we use the CVec to determine the string representation
+// We use the vec and cVec to find the indices in Flat that need to be
+// populated, and we use the cVec to determine the string representation
 // the location's color.
-func (fl *Flat) PaintCubi(cubi Cubi, n uint) {
+func (fl *Flat) PaintCubi(cubi cubi, n uint) {
 	for _, ax := range [...]Axis{Xax, Yax, Zax} {
 		if cubi.cv[ax] == 0 {
 			continue
@@ -261,9 +261,9 @@ func (fl Flat) Cube() Cube {
 
 	var cube Cube
 	cube.n = uint(n)
-	cube.cubis = make([]Cubi, int(math.Pow(float64(n), 3)-math.Pow(float64(n)-2, 3)))
+	cube.cubis = make([]cubi, int(math.Pow(float64(n), 3)-math.Pow(float64(n)-2, 3)))
 
-	preCube := make(map[Vec]CVec)
+	preCube := make(map[vec]cVec)
 	for r := 0; r < n*3; r++ {
 		c := 0
 		for ; c < n*4; c++ {
@@ -277,8 +277,8 @@ func (fl Flat) Cube() Cube {
 
 			var axis Axis
 			var polarity bool
-			var pv Vec
-			var cv CVec
+			var pv vec
+			var cv cVec
 
 			if r < n {
 				// Size 5 (yellow)
@@ -359,7 +359,7 @@ func (fl Flat) Cube() Cube {
 		if debug {
 			fmt.Println(pvec, cvec)
 		}
-		cube.cubis[ncubi] = Cubi{cv: cvec, pv: pvec}
+		cube.cubis[ncubi] = cubi{cv: cvec, pv: pvec}
 		ncubi += 1
 	}
 

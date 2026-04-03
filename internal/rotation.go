@@ -19,8 +19,8 @@ func (dir Direction) String() string {
 
 // Returns a 90 degree rotation matrix about an axis,
 // either counter-clockwise or clockwise
-func GetRotationMatrix(a Axis, counter Direction) Matrix {
-	var ret Matrix
+func GetRotationMatrix(a Axis, counter Direction) matrix {
+	var ret matrix
 	switch a {
 	case Xax:
 		if counter {
