@@ -7,21 +7,21 @@ package main
 import (
 	"fmt"
 
-	. "github.com/dfava/cube/internal"
+	"github.com/dfava/cube/internal"
 )
 
 func main() {
-	//PrintInColors(false)
+	internal.PrintInColors(false)
 	fmt.Println("Printing all possible moves of a Rubik's cube,")
 	fmt.Println("starting from the initial configuration.")
 	fmt.Println()
 	var n uint
 	n = 3
-	cb := New(n)
-	var c2 Cube
-	for _, ax := range [...]Axis{Xax, Yax, Zax} {
+	cb := internal.New(n)
+	var c2 internal.Cube
+	for _, ax := range [...]internal.Axis{internal.Xax, internal.Yax, internal.Zax} {
 		for idx := -int(n) / 2; idx <= int(n)/2; idx++ {
-			for _, dir := range [...]Direction{Counterclock, Clock} {
+			for _, dir := range [...]internal.Direction{internal.Counterclock, internal.Clock} {
 				if n%2 == 0 && idx == 0 {
 					continue
 				}

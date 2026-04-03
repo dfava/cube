@@ -7,7 +7,7 @@ package main
 import (
 	"fmt"
 
-	. "github.com/dfava/cube/internal"
+	"github.com/dfava/cube/internal"
 )
 
 // The commutator of g and h is [g,h]:
@@ -24,31 +24,31 @@ import (
 // g.h as well as [g,h]
 // Note that [g,h] is closer to the identify than g.h
 func main() {
-	//PrintInColors(false)
-	cb := New(3)
+	internal.PrintInColors(false)
+	cb := internal.New(3)
 	fmt.Println(cb)
 	fmt.Println()
 
-	cb = cb.Turn(Xax, -1, Counterclock) // g
-	cb = cb.Turn(Yax, -1, Counterclock) // h
+	cb = cb.Turn(internal.Xax, -1, internal.Counterclock) // g
+	cb = cb.Turn(internal.Yax, -1, internal.Counterclock) // h
 	fmt.Println("g . h")
 	fmt.Println(cb)
 	fmt.Println()
 
 	cb.Reset()
 
-	cb = cb.Turn(Xax, -1, Clock) // g^(-1)
+	cb = cb.Turn(internal.Xax, -1, internal.Clock) // g^(-1)
 	//fmt.Println(cb)
 	//fmt.Println()
-	cb = cb.Turn(Yax, -1, Clock) // h^(-1)
+	cb = cb.Turn(internal.Yax, -1, internal.Clock) // h^(-1)
 	//fmt.Println("g^(-1) . h^(-1)")
 	//fmt.Println(cb)
 	//fmt.Println()
 
-	cb = cb.Turn(Xax, -1, Counterclock) // g
+	cb = cb.Turn(internal.Xax, -1, internal.Counterclock) // g
 	//fmt.Println(cb)
 	//fmt.Println()
-	cb = cb.Turn(Yax, -1, Counterclock) // h
+	cb = cb.Turn(internal.Yax, -1, internal.Counterclock) // h
 	fmt.Println("g^(-1) . h^(-1) . g . h")
 	fmt.Println(cb)
 	fmt.Println()

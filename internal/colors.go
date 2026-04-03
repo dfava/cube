@@ -40,7 +40,21 @@ func (c Color) String() string {
 	return str + names[c]
 }
 
-var stringToColor map[string]Color
+var stringToColor = map[string]Color{
+	" ":                zero,
+	"g":                green,
+	"w":                white,
+	"o":                orange,
+	"r":                red,
+	"y":                yellow,
+	"b":                blue,
+	"\033[32mg\033[0m": green,
+	"\033[37mw\033[0m": white,
+	"\033[35mo\033[0m": orange,
+	"\033[31mr\033[0m": red,
+	"\033[33my\033[0m": yellow,
+	"\033[34mb\033[0m": blue,
+}
 
 func ParseColor(str string) (Color, error) {
 	c, ok := stringToColor[str]

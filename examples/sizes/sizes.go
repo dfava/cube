@@ -7,16 +7,22 @@ package main
 import (
 	"fmt"
 
-	. "github.com/dfava/cube/internal"
+	"github.com/dfava/cube/internal"
 )
 
 func main() {
-	//PrintInColors(false)
-	cb := New(3)
+	internal.PrintInColors(false)
+	fmt.Println("Cubes of different sizes")
+	cb := internal.New(2)
 	fmt.Println(cb)
 	fmt.Println()
-
-	cb = swap_top_corners(cb)
+	cb = internal.New(3)
+	fmt.Println(cb)
+	fmt.Println()
+	cb = internal.New(4)
+	fmt.Println(cb)
+	fmt.Println()
+	cb = internal.New(5)
 	fmt.Println(cb)
 	fmt.Println()
 }

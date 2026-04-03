@@ -7,13 +7,13 @@ package main
 import (
 	"fmt"
 
-	. "github.com/dfava/cube/internal"
+	"github.com/dfava/cube/internal"
 )
 
 // Perform moves at random, starting from the initial configuration
 func main() {
-	//PrintInColors(false)
-	cb := New(3)
+	internal.PrintInColors(false)
+	cb := internal.New(3)
 	fmt.Print("shuffle: performing moves at random, ")
 	fmt.Println("starting from the initial configuration")
 	fmt.Println(cb)

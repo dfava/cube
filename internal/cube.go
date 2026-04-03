@@ -18,9 +18,8 @@ func (a cVec) or(b cVec) cVec {
 	or := func(a Color, b Color) Color {
 		if a == zero {
 			return b
-		} else {
-			return a
 		}
+		return a
 	}
 	c[0] = or(a[0], b[0])
 	c[1] = or(a[1], b[1])
@@ -32,11 +31,11 @@ func (a cVec) or(b cVec) cVec {
 //
 // The function multiplies the matrix by the position vector and
 // it multiplies the matrix by the color vector
-func (m *matrix) mult(cubi cubi) cubi {
+func (m *matrix) mult(cbi cubi) cubi {
 	var ret cubi
 	for i := 0; i <= 2; i++ {
-		ret.pv[i] = m[i][0]*cubi.pv[0] + m[i][1]*cubi.pv[1] + m[i][2]*cubi.pv[2]
-		ret.cv[i] = Color(m[i][0]*int(cubi.cv[0]) + m[i][1]*int(cubi.cv[1]) + m[i][2]*int(cubi.cv[2]))
+		ret.pv[i] = m[i][0]*cbi.pv[0] + m[i][1]*cbi.pv[1] + m[i][2]*cbi.pv[2]
+		ret.cv[i] = Color(m[i][0]*int(cbi.cv[0]) + m[i][1]*int(cbi.cv[1]) + m[i][2]*int(cbi.cv[2]))
 	}
 	return ret
 }
@@ -216,7 +215,7 @@ func (cube Cube) GetAllRotations() []Cube {
 		}
 
 		current = toExplore[0]
-		toExplore = toExplore[1:len(toExplore)]
+		toExplore = toExplore[1:]
 	}
 }
 
@@ -291,25 +290,5 @@ func (cube *Cube) IsCanonical() bool {
 }
 
 func init() {
-	printInColors = true
 	rand.Seed(42) // Pseudo random
-
-	stringToColor = make(map[string]Color)
-	stringToColor[" "] = zero
-	stringToColor["g"] = green
-	stringToColor["w"] = white
-	stringToColor["o"] = orange
-	stringToColor["r"] = red
-	stringToColor["y"] = yellow
-	stringToColor["b"] = blue
-	stringToColor["\033[32mg\033[0m"] = green
-	stringToColor["\033[37mw\033[0m"] = white
-	stringToColor["\033[35mo\033[0m"] = orange
-	stringToColor["\033[31mr\033[0m"] = red
-	stringToColor["\033[33my\033[0m"] = yellow
-	stringToColor["\033[34mb\033[0m"] = blue
-}
-
-func PrintInColors(flag bool) {
-	printInColors = flag
 }
