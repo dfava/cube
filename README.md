@@ -10,21 +10,31 @@ Installing the package:
 go get -v github.com/dfava/cube
 ```
 
-then using it:
+### CLI
 
+The package also includes a command-line interface for interacting with the Rubik's Cube.
+
+To build the CLI:
+
+```bash
+go build -o cube-cli ./cmd/cli/main.go
 ```
-package main
 
-import (
-	"fmt"
-	"github.com/dfava/cube"
-)
+Then run it:
 
-func main() {
-	cb := cube.New(3)
-	fmt.Println(cb)
-}
+```bash
+./cube-cli
 ```
+
+The CLI supports the following commands:
+- `x <idx> <c|cc>`, `y <idx> <c|cc>`, `z <idx> <c|cc>`: Rotate the cube about an axis.
+- `u`, `undo`: Undo the last move.
+- `s`, `shuffle`: Perform 20 random moves.
+- `n`, `new <size>`: Create a new cube of size `n`.
+- `p`, `playback`: Show the history of moves step by step.
+- `r`, `reset`: Reset the cube to its initial state.
+- `h`, `help`: Show the help menu.
+- `q`, `quit`: Exit the CLI.
 
 For more, see the `examples` folder.
 
