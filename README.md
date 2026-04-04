@@ -17,7 +17,7 @@ The package also includes a command-line interface for interacting with the Rubi
 To build the CLI:
 
 ```bash
-go build -o cube-cli ./cmd/cli/main.go
+go build -o cube-cli ./cmd/cli/
 ```
 
 Then run it:
