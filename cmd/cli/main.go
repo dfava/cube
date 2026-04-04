@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"math/rand"
 	"os"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dfava/cube/internal"
+	"golang.org/x/term"
 )
 
 const animSpeed = 250 * time.Millisecond
@@ -28,28 +28,52 @@ func main() {
 	history := []internal.Cube{cb}
 	moves := []move{}
 
-	scanner := bufio.NewScanner(os.Stdin)
+	// cmdHistory stores previously entered commands for up-arrow navigation.
+	cmdHistory := []string{}
+	const maxHistory = 1000
+
+	// Put terminal in raw mode for x/term to handle input properly.
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error putting terminal in raw mode: %v\r\n", err)
+		return
+	}
+	defer term.Restore(int(os.Stdin.Fd()), oldState)
+
+	t := term.NewTerminal(os.Stdin, "> ")
+
 	printHelp(n)
 	helpVisible := true
-
 	showCube := true
+
 	for {
 		if showCube {
 			clearScreen()
 			if helpVisible {
 				printHelp(n)
 			}
-			fmt.Printf("\nCube state (moves: %d):\n%s\n", len(history)-1, history[len(history)-1])
+			printAxes()
+			fmt.Printf("\r\nCube state (moves: %d):\r\n%s\r\n", len(history)-1, history[len(history)-1])
 		}
 		showCube = true
-		fmt.Print("> ")
-		if !scanner.Scan() {
+
+		input, err := t.ReadLine()
+		if err != nil {
 			break
 		}
-		input := strings.TrimSpace(scanner.Text())
+
+		input = strings.TrimSpace(input)
 		if input == "" {
 			showCube = false
 			continue
+		}
+
+		// Add to command history if it's different from the last one.
+		if len(cmdHistory) == 0 || cmdHistory[len(cmdHistory)-1] != input {
+			cmdHistory = append(cmdHistory, input)
+			if len(cmdHistory) > maxHistory {
+				cmdHistory = cmdHistory[1:]
+			}
 		}
 
 		parts := strings.Fields(input)
@@ -61,13 +85,13 @@ func main() {
 			printHelp(n)
 		case "n", "new":
 			if len(parts) < 2 {
-				fmt.Println("Invalid size. Usage: new <size>")
+				fmt.Println("Invalid size. Usage: new <size>\r")
 				showCube = false
 				continue
 			}
 			newSize, err := strconv.ParseUint(parts[1], 10, 32)
 			if err != nil || newSize < 1 {
-				fmt.Printf("Invalid size: %s. Please provide a positive integer.\n", parts[1])
+				fmt.Printf("Invalid size: %s. Please provide a positive integer.\r\n", parts[1])
 				showCube = false
 				continue
 			}
@@ -76,28 +100,27 @@ func main() {
 			history = []internal.Cube{cb}
 			moves = []move{}
 			helpVisible = true
-			fmt.Printf("Created a new %dx%d cube.\n", n, n)
+			fmt.Printf("Created a new %dx%d cube.\r\n", n, n)
 		case "q", "quit", "exit":
-			fmt.Println("Goodbye!")
+			fmt.Println("Goodbye!\r")
 			return
 		case "r", "reset":
 			cb = internal.New(n)
 			history = []internal.Cube{cb}
 			moves = []move{}
 			helpVisible = true
-			fmt.Println("Cube reset.")
+			fmt.Println("Cube reset.\r")
 		case "u", "undo":
 			if len(history) > 1 {
 				history = history[:len(history)-1]
 				moves = moves[:len(moves)-1]
-				fmt.Println("Undo successful.")
+				fmt.Println("Undo successful.\r")
 			} else {
-				fmt.Println("Nothing to undo.")
+				fmt.Println("Nothing to undo.\r")
 			}
 		case "s", "shuffle":
-			// We'll do 20 random moves
 			current := history[len(history)-1]
-			for i := 0; i < 20; i++ {
+			for range 20 {
 				ax, idx, dir := randomMove(n)
 				current = current.Turn(ax, idx, dir)
 				if n%2 == 1 && idx == 0 {
@@ -106,23 +129,22 @@ func main() {
 				history = append(history, current)
 				moves = append(moves, move{ax, idx, dir, fmt.Sprintf("shuffle %s %d %s", ax, idx, dir)})
 			}
-			fmt.Println("Cube shuffled (20 moves added to history).")
+			fmt.Println("Cube shuffled (20 moves added to history).\r")
 		case "p", "playback":
 			if len(moves) == 0 {
-				fmt.Println("No history to play back.")
+				fmt.Println("No history to play back.\r")
 				showCube = false
 				continue
 			}
-			fmt.Println("Playing back history:")
+			fmt.Println("Playing back history:\r")
 			for i, m := range moves {
-				fmt.Printf("Step %d: %s\n", i+1, m.desc)
+				fmt.Printf("Step %d: %s\r\n", i+1, m.desc)
 				animateMove(history[i], m.axis, m.idx, m.dir, n, helpVisible)
-				// Small delay between different steps in playback
 				time.Sleep(3 * animSpeed)
 			}
 		case "x", "y", "z":
 			if len(parts) < 3 {
-				fmt.Println("Invalid move. Usage: <axis> <index> <direction: c|cc>")
+				fmt.Println("Invalid move. Usage: <axis> <index> <direction: c|cc>\r")
 				showCube = false
 				continue
 			}
@@ -137,11 +159,10 @@ func main() {
 			}
 			idx, err := strconv.Atoi(parts[1])
 			if err != nil {
-				fmt.Printf("Invalid index: %s\n", parts[1])
+				fmt.Printf("Invalid index: %s\r\n", parts[1])
 				showCube = false
 				continue
 			}
-			// Validate index range
 			minIdx := -int(n) / 2
 			maxIdx := int(n) / 2
 			if idx < minIdx || idx > maxIdx || (n%2 == 0 && idx == 0) {
@@ -149,7 +170,7 @@ func main() {
 				if n%2 == 0 {
 					fmt.Print(" (excluding 0)")
 				}
-				fmt.Println(".")
+				fmt.Println(".\r")
 				showCube = false
 				continue
 			}
@@ -160,7 +181,7 @@ func main() {
 			} else if dirPart == "cc" {
 				dir = internal.Counterclock
 			} else {
-				fmt.Printf("Invalid direction: %s. Use 'c' or 'cc'.\n", parts[2])
+				fmt.Printf("Invalid direction: %s. Use 'c' or 'cc'.\r\n", parts[2])
 				showCube = false
 				continue
 			}
@@ -174,7 +195,7 @@ func main() {
 			history = append(history, next)
 			moves = append(moves, move{ax, idx, dir, fmt.Sprintf("%s %d %s", ax, idx, dir)})
 		default:
-			fmt.Printf("Unknown command: %s. Type 'h' for help.\n", cmd)
+			fmt.Printf("Unknown command: %s. Type 'h' for help.\r\n", cmd)
 			helpVisible = false
 			showCube = false
 		}
@@ -182,23 +203,34 @@ func main() {
 }
 
 func printHelp(n uint) {
-	fmt.Println("Rubik's Cube CLI")
-	fmt.Println("Commands:")
-	fmt.Println("  x <idx> <c|cc>  : Turn about X-axis at index <idx> (c: clockwise, cc: counter-clockwise)")
-	fmt.Println("  y <idx> <c|cc>  : Turn about Y-axis at index <idx>")
-	fmt.Println("  z <idx> <c|cc>  : Turn about Z-axis at index <idx>")
-	fmt.Println("  u, undo         : Undo the last turn")
-	fmt.Println("  s, shuffle      : Shuffle the cube (20 random moves)")
-	fmt.Println("  r, reset        : Reset the cube to initial state")
-	fmt.Println("  n, new <size>   : Create a new cube of size <size>")
-	fmt.Println("  p, playback     : Play back the history of turns")
-	fmt.Println("  h, help         : Show this help")
-	fmt.Println("  q, quit         : Exit the application")
-	fmt.Printf("\nIndex range for a %dx%d cube is %d to %d", n, n, -int(n)/2, int(n)/2)
+	fmt.Println("Rubik's Cube CLI\r")
+	fmt.Println("Commands:\r")
+	fmt.Println("  x <idx> <c|cc>  : Turn about X-axis at index <idx> (c: clockwise, cc: counter-clockwise)\r")
+	fmt.Println("  y <idx> <c|cc>  : Turn about Y-axis at index <idx>\r")
+	fmt.Println("  z <idx> <c|cc>  : Turn about Z-axis at index <idx>\r")
+	// Added a small tip about history
+	fmt.Println("  [Up Arrow]      : Recall previous command\r")
+	fmt.Println("  u, undo         : Undo the last turn\r")
+	fmt.Println("  s, shuffle      : Shuffle the cube (20 random moves)\r")
+	fmt.Println("  r, reset        : Reset the cube to initial state\r")
+	fmt.Println("  n, new <size>   : Create a new cube of size <size>\r")
+	fmt.Println("  p, playback     : Play back the history of turns\r")
+	fmt.Println("  h, help         : Show this help\r")
+	fmt.Println("  q, quit         : Exit the application\r")
+	fmt.Printf("\r\nIndex range for a %dx%d cube is %d to %d", n, n, -int(n)/2, int(n)/2)
 	if n%2 == 0 {
 		fmt.Print(" (excluding 0)")
 	}
-	fmt.Println(".")
+	fmt.Println(".\r")
+}
+
+func printAxes() {
+	fmt.Println("\r\nAxis directions:\r")
+	fmt.Println("   z\r")
+	fmt.Println("   |\r")
+	fmt.Println("   +--- x\r")
+	fmt.Println("  /\r")
+	fmt.Println(" y\r")
 }
 
 func randomMove(n uint) (internal.Axis, int, internal.Direction) {
@@ -231,7 +263,6 @@ func animateMove(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direc
 	var startFl internal.Flat
 	startFl.PaintCube(cb)
 
-	// Decompose permutation into disjoint cycles
 	visited := make(map[[2]int]bool)
 	var cycles [][][2]int
 	for start := range perm {
@@ -250,15 +281,12 @@ func animateMove(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direc
 		}
 	}
 
-	// Refine cycles into rings by interpolating between points
-	// This helps with the "marching" feel for side faces
 	var rings [][][2]int
 	for _, cycle := range cycles {
 		var ring [][2]int
 		for i := 0; i < len(cycle); i++ {
 			p1 := cycle[i]
 			p2 := cycle[(i+1)%len(cycle)]
-			// Interpolate p1 to p2 (Manhattan path)
 			ring = append(ring, p1)
 			r, c := p1[0], p1[1]
 			for r != p2[0] {
@@ -285,14 +313,10 @@ func animateMove(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direc
 		rings = append(rings, ring)
 	}
 
-	// Animation frames: 0 to n
 	for frame := 0; frame <= int(n); frame++ {
-		// Build the frame from scratch for the affected cells
 		tempFl := startFl.Copy()
 		for _, ring := range rings {
 			m := len(ring)
-			// Total shift in one 90-degree turn is m/4
-			// So at step 'frame', we shift by round(frame/n * m/4)
 			shift := int(float64(frame)*float64(m)/(4.0*float64(n)) + 0.5)
 			for i := 0; i < m; i++ {
 				pOrig := ring[i]
@@ -305,7 +329,8 @@ func animateMove(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direc
 		if helpVisible {
 			printHelp(n)
 		}
-		fmt.Printf("\nAnimating move: %s %d %s\n%s\n", ax, idx, dir, tempFl)
+		printAxes()
+		fmt.Printf("\r\nAnimating move: %s %d %s\r\n%s\r\n", ax, idx, dir, tempFl)
 
 		if frame < int(n) {
 			time.Sleep(animSpeed)

@@ -75,7 +75,7 @@ func (fl Flat) String() string {
 			}
 		}
 		if r != (n*3-1) && c == n*4 {
-			str += "\n"
+			str += "\r\n"
 		}
 	}
 	return str
