@@ -45,6 +45,16 @@ import (
 
 type Flat [][]string
 
+func (fl Flat) Copy() Flat {
+	n := len(fl) / 3
+	ret := make([][]string, n*3)
+	for i := range fl {
+		ret[i] = make([]string, n*4)
+		copy(ret[i], fl[i])
+	}
+	return ret
+}
+
 func (fl Flat) String() string {
 	n := len(fl) / 3
 	str := ""

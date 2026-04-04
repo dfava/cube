@@ -7,9 +7,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/dfava/cube/internal"
 )
+
+const animSpeed = 250 * time.Millisecond
 
 type move struct {
 	axis internal.Axis
@@ -27,10 +30,15 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	printHelp(n)
+	helpVisible := true
 
 	showCube := true
 	for {
 		if showCube {
+			clearScreen()
+			if helpVisible {
+				printHelp(n)
+			}
 			fmt.Printf("\nCube state (moves: %d):\n%s\n", len(history)-1, history[len(history)-1])
 		}
 		showCube = true
@@ -49,6 +57,7 @@ func main() {
 
 		switch cmd {
 		case "h", "help":
+			helpVisible = true
 			printHelp(n)
 		case "n", "new":
 			if len(parts) < 2 {
@@ -66,6 +75,7 @@ func main() {
 			cb = internal.New(n)
 			history = []internal.Cube{cb}
 			moves = []move{}
+			helpVisible = true
 			fmt.Printf("Created a new %dx%d cube.\n", n, n)
 		case "q", "quit", "exit":
 			fmt.Println("Goodbye!")
@@ -74,6 +84,7 @@ func main() {
 			cb = internal.New(n)
 			history = []internal.Cube{cb}
 			moves = []move{}
+			helpVisible = true
 			fmt.Println("Cube reset.")
 		case "u", "undo":
 			if len(history) > 1 {
@@ -105,8 +116,9 @@ func main() {
 			fmt.Println("Playing back history:")
 			for i, m := range moves {
 				fmt.Printf("Step %d: %s\n", i+1, m.desc)
-				fmt.Println(history[i+1])
-				fmt.Println("--------------------")
+				animateMove(history[i], m.axis, m.idx, m.dir, n, helpVisible)
+				// Small delay between different steps in playback
+				time.Sleep(3 * animSpeed)
 			}
 		case "x", "y", "z":
 			if len(parts) < 3 {
@@ -158,10 +170,12 @@ func main() {
 			if n%2 == 1 && idx == 0 {
 				next = next.Rotate(ax, !dir)
 			}
+			animateMove(current, ax, idx, dir, n, helpVisible)
 			history = append(history, next)
 			moves = append(moves, move{ax, idx, dir, fmt.Sprintf("%s %d %s", ax, idx, dir)})
 		default:
 			fmt.Printf("Unknown command: %s. Type 'h' for help.\n", cmd)
+			helpVisible = false
 			showCube = false
 		}
 	}
@@ -202,4 +216,100 @@ func randomMove(n uint) (internal.Axis, int, internal.Direction) {
 	idx := idxs[rand.Intn(len(idxs))]
 	dir := dirs[rand.Intn(len(dirs))]
 	return ax, idx, dir
+}
+
+func clearScreen() {
+	fmt.Print("\033[H\033[2J")
+}
+
+func animateMove(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direction, n uint, helpVisible bool) {
+	perm := cb.GetFlatPermutation(ax, idx, dir)
+	if len(perm) == 0 {
+		return
+	}
+
+	var startFl internal.Flat
+	startFl.PaintCube(cb)
+
+	// Decompose permutation into disjoint cycles
+	visited := make(map[[2]int]bool)
+	var cycles [][][2]int
+	for start := range perm {
+		if visited[start] {
+			continue
+		}
+		var cycle [][2]int
+		curr := start
+		for !visited[curr] {
+			visited[curr] = true
+			cycle = append(cycle, curr)
+			curr = perm[curr]
+		}
+		if len(cycle) > 1 {
+			cycles = append(cycles, cycle)
+		}
+	}
+
+	// Refine cycles into rings by interpolating between points
+	// This helps with the "marching" feel for side faces
+	var rings [][][2]int
+	for _, cycle := range cycles {
+		var ring [][2]int
+		for i := 0; i < len(cycle); i++ {
+			p1 := cycle[i]
+			p2 := cycle[(i+1)%len(cycle)]
+			// Interpolate p1 to p2 (Manhattan path)
+			ring = append(ring, p1)
+			r, c := p1[0], p1[1]
+			for r != p2[0] {
+				if r < p2[0] {
+					r++
+				} else {
+					r--
+				}
+				if r != p2[0] || c != p2[1] {
+					ring = append(ring, [2]int{r, c})
+				}
+			}
+			for c != p2[1] {
+				if c < p2[1] {
+					c++
+				} else {
+					c--
+				}
+				if r != p2[0] || c != p2[1] {
+					ring = append(ring, [2]int{r, c})
+				}
+			}
+		}
+		rings = append(rings, ring)
+	}
+
+	// Animation frames: 0 to n
+	for frame := 0; frame <= int(n); frame++ {
+		// Build the frame from scratch for the affected cells
+		tempFl := startFl.Copy()
+		for _, ring := range rings {
+			m := len(ring)
+			// Total shift in one 90-degree turn is m/4
+			// So at step 'frame', we shift by round(frame/n * m/4)
+			shift := int(float64(frame)*float64(m)/(4.0*float64(n)) + 0.5)
+			for i := 0; i < m; i++ {
+				pOrig := ring[i]
+				pNew := ring[(i+shift)%m]
+				tempFl[pNew[0]][pNew[1]] = startFl[pOrig[0]][pOrig[1]]
+			}
+		}
+
+		clearScreen()
+		if helpVisible {
+			printHelp(n)
+		}
+		fmt.Printf("\nAnimating move: %s %d %s\n%s\n", ax, idx, dir, tempFl)
+
+		if frame < int(n) {
+			time.Sleep(animSpeed)
+		}
+	}
+	time.Sleep(2 * animSpeed)
 }

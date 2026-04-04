@@ -288,3 +288,59 @@ func (cube Cube) IsCanonical() bool {
 	}
 	return canon
 }
+
+func (cube Cube) GetFlatPermutation(ax Axis, idx int, dir Direction) map[[2]int][2]int {
+	n := cube.n
+	type faceID struct {
+		cubiIdx int
+		axis    Axis
+	}
+	startPos := make(map[faceID][2]int)
+	for i, cbi := range cube.cubis {
+		for _, a := range [...]Axis{Xax, Yax, Zax} {
+			if cbi.cv[a] != 0 {
+				proj := project(n, a, cbi.cv[a] > 0)
+				r := int(n/2) + proj.sign[row]*cbi.pv[proj.axis[row]] + proj.offset[row]
+				c := int(n/2) + proj.sign[col]*cbi.pv[proj.axis[col]] + proj.offset[col]
+				if n%2 == 0 {
+					signArray := [3]float64{
+						float64(getSign(cbi.pv[Xax])),
+						float64(getSign(cbi.pv[Yax])),
+						float64(getSign(cbi.pv[Zax]))}
+					r += proj.sign[row] * int(proj.fun[row](-signArray[proj.axis[row]]*0.5))
+					c += proj.sign[col] * int(proj.fun[col](-signArray[proj.axis[col]]*0.5))
+				}
+				startPos[faceID{i, a}] = [2]int{r, c}
+			}
+		}
+	}
+
+	nextCube := cube.Turn(ax, idx, dir)
+	if n%2 == 1 && idx == 0 {
+		nextCube = nextCube.Rotate(ax, !dir)
+	}
+
+	permutation := make(map[[2]int][2]int)
+	for i, cbi := range nextCube.cubis {
+		for _, a := range [...]Axis{Xax, Yax, Zax} {
+			if cbi.cv[a] != 0 {
+				proj := project(n, a, cbi.cv[a] > 0)
+				r := int(n/2) + proj.sign[row]*cbi.pv[proj.axis[row]] + proj.offset[row]
+				c := int(n/2) + proj.sign[col]*cbi.pv[proj.axis[col]] + proj.offset[col]
+				if n%2 == 0 {
+					signArray := [3]float64{
+						float64(getSign(cbi.pv[Xax])),
+						float64(getSign(cbi.pv[Yax])),
+						float64(getSign(cbi.pv[Zax]))}
+					r += proj.sign[row] * int(proj.fun[row](-signArray[proj.axis[row]]*0.5))
+					c += proj.sign[col] * int(proj.fun[col](-signArray[proj.axis[col]]*0.5))
+				}
+				sPos, ok := startPos[faceID{i, a}]
+				if ok {
+					permutation[sPos] = [2]int{r, c}
+				}
+			}
+		}
+	}
+	return permutation
+}
