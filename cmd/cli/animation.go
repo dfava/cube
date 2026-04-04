@@ -7,7 +7,9 @@ import (
 	"github.com/dfava/cube/internal"
 )
 
-func animateMove(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direction, n uint, helpVisible bool) {
+type RigidAnimator struct{}
+
+func (a RigidAnimator) Animate(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direction, n uint, helpVisible bool) {
 	perm := cb.GetFlatPermutation(ax, idx, dir)
 	if len(perm) == 0 {
 		return
@@ -76,7 +78,7 @@ func animateMove(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direc
 		tempFl := startFl.Copy()
 		if frame == int(n) {
 			// Safeguard: Last frame is always the target state
-			nextCb := cb.Turn(ax, idx, dir)
+			nextCb := cb.Move(internal.Move{Axis: ax, Idx: idx, Direction: dir})
 			if n%2 == 1 && idx == 0 {
 				nextCb = nextCb.Rotate(ax, !dir)
 			}

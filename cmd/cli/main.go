@@ -14,6 +14,10 @@ import (
 
 const animSpeed = 250 * time.Millisecond
 
+type Animator interface {
+	Animate(cb internal.Cube, ax internal.Axis, idx int, dir internal.Direction, n uint, helpVisible bool)
+}
+
 type move struct {
 	axis internal.Axis
 	idx  int
@@ -27,6 +31,7 @@ func main() {
 	cb := internal.New(n)
 	history := []internal.Cube{cb}
 	moves := []move{}
+	var animator Animator = DummyAnimator{}
 
 	// cmdHistory stores previously entered commands for up-arrow navigation.
 	cmdHistory := []string{}
@@ -35,10 +40,12 @@ func main() {
 	// Put terminal in raw mode for x/term to handle input properly.
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error putting terminal in raw mode: %v\r\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "Error putting terminal in raw mode: %v\r\n", err)
 		return
 	}
-	defer term.Restore(int(os.Stdin.Fd()), oldState)
+	defer func() {
+		_ = term.Restore(int(os.Stdin.Fd()), oldState)
+	}()
 
 	t := term.NewTerminal(os.Stdin, "> ")
 
@@ -122,7 +129,7 @@ func main() {
 			current := history[len(history)-1]
 			for range 20 {
 				ax, idx, dir := randomMove(n)
-				current = current.Turn(ax, idx, dir)
+				current = current.Move(internal.Move{Axis: ax, Idx: idx, Direction: dir})
 				if n%2 == 1 && idx == 0 {
 					current = current.Rotate(ax, !dir)
 				}
@@ -139,7 +146,7 @@ func main() {
 			fmt.Println("Playing back history:\r")
 			for i, m := range moves {
 				fmt.Printf("Step %d: %s\r\n", i+1, m.desc)
-				animateMove(history[i], m.axis, m.idx, m.dir, n, helpVisible)
+				animator.Animate(history[i], m.axis, m.idx, m.dir, n, helpVisible)
 				time.Sleep(3 * animSpeed)
 			}
 		case "x", "y", "z":
@@ -148,15 +155,7 @@ func main() {
 				showCube = false
 				continue
 			}
-			var ax internal.Axis
-			switch cmd {
-			case "x":
-				ax = internal.Xax
-			case "y":
-				ax = internal.Yax
-			case "z":
-				ax = internal.Zax
-			}
+			ax, _ := internal.ParseAxis(cmd)
 			idx, err := strconv.Atoi(parts[1])
 			if err != nil {
 				fmt.Printf("Invalid index: %s\r\n", parts[1])
@@ -187,11 +186,11 @@ func main() {
 			}
 
 			current := history[len(history)-1]
-			next := current.Turn(ax, idx, dir)
+			next := current.Move(internal.Move{Axis: ax, Idx: idx, Direction: dir})
 			if n%2 == 1 && idx == 0 {
 				next = next.Rotate(ax, !dir)
 			}
-			animateMove(current, ax, idx, dir, n, helpVisible)
+			animator.Animate(current, ax, idx, dir, n, helpVisible)
 			history = append(history, next)
 			moves = append(moves, move{ax, idx, dir, fmt.Sprintf("%s %d %s", ax, idx, dir)})
 		default:

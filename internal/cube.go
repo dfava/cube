@@ -139,16 +139,34 @@ func (cube Cube) GetSize() uint {
 	return cube.n
 }
 
+type Move struct {
+	Axis      Axis
+	Idx       int
+	Direction Direction
+}
+
 // Performs a move on a cube by turning part of the
 // cube about an Axis in a particular direction
-func (cube Cube) Turn(a Axis, idx int, counter Direction) Cube {
+func (cube Cube) Move(m Move) Cube {
 	ret := cube.Copy()
-	m := GetRotationMatrix(a, counter)
+	mat := GetRotationMatrix(m.Axis, m.Direction)
 	for cube_idx := range cube.cubis {
-		if cube.cubis[cube_idx].pv[a] == idx {
+		if cube.cubis[cube_idx].pv[m.Axis] == m.Idx {
 			// We rotate via matrix multiplication
-			ret.cubis[cube_idx] = m.mult(cube.cubis[cube_idx])
+			ret.cubis[cube_idx] = mat.mult(cube.cubis[cube_idx])
 		}
+	}
+	return ret
+}
+
+// similar to a map function
+func (cube Cube) Moves(ms []Move) []Cube {
+	ret := make([]Cube, len(ms))
+	curr := cube
+	for _, m := range ms {
+		next := curr.Move(m)
+		ret = append(ret, next)
+		curr = next
 	}
 	return ret
 }
@@ -162,7 +180,7 @@ func (cube Cube) GetAllTurns() []Cube {
 				if cube.n%2 == 0 && idx == 0 {
 					continue
 				}
-				newCube := cube.Turn(ax, idx, dir)
+				newCube := cube.Move(Move{Axis: ax, Idx: idx, Direction: dir})
 				if cube.n%2 == 1 && idx == 0 {
 					// Preserves a canonical cube
 					newCube = newCube.Rotate(ax, !dir)
@@ -234,7 +252,7 @@ func (cube *Cube) Shuffle(times uint) {
 		if cube.n%2 == 0 && idx == 0 {
 			continue
 		}
-		(*cube) = cube.Turn(ax, idx, dir)
+		(*cube) = cube.Move(Move{Axis: ax, Idx: idx, Direction: dir})
 		if idx == 0 { // Preserve the cube's orientation
 			(*cube) = cube.Rotate(ax, !dir)
 		}
@@ -315,7 +333,7 @@ func (cube Cube) GetFlatPermutation(ax Axis, idx int, dir Direction) map[[2]int]
 		}
 	}
 
-	nextCube := cube.Turn(ax, idx, dir)
+	nextCube := cube.Move(Move{Axis: ax, Idx: idx, Direction: dir})
 	if n%2 == 1 && idx == 0 {
 		nextCube = nextCube.Rotate(ax, !dir)
 	}

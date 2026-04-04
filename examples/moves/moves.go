@@ -29,7 +29,7 @@ func main() {
 				fmt.Printf("at index %d in the direction %s\n", idx, dir)
 				fmt.Println(cb)
 				fmt.Println()
-				c2 = cb.Turn(ax, idx, dir)
+				c2 = cb.Move(internal.Move{Axis: ax, Idx: idx, Direction: dir})
 				fmt.Println(c2)
 				fmt.Println()
 			}

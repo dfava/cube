@@ -13,38 +13,38 @@ import (
 // Turn middle cubi at (0,1,1) so that the green and the yellow are reversed
 func turn_middle(cb internal.Cube) internal.Cube {
 	// Turn
-	cb = cb.Turn(internal.Xax, 0, internal.Counterclock)
-	cb = cb.Turn(internal.Zax, -1, internal.Counterclock)
-	cb = cb.Turn(internal.Zax, -1, internal.Counterclock)
-	cb = cb.Turn(internal.Xax, 0, internal.Clock)
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Clock})
 	// Notice that these next four moves are a commutator!
-	cb = cb.Turn(internal.Zax, -1, internal.Clock)
-	cb = cb.Turn(internal.Xax, 0, internal.Counterclock)
-	cb = cb.Turn(internal.Zax, -1, internal.Counterclock)
-	cb = cb.Turn(internal.Xax, 0, internal.Clock)
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Clock})
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Clock})
 	//fmt.Println(cb)
 	//fmt.Println()
 
 	//
-	cb = cb.Turn(internal.Zax, 1, internal.Counterclock)
-	cb = cb.Turn(internal.Zax, 1, internal.Counterclock)
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: 1, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: 1, Direction: internal.Counterclock})
 	//fmt.Println(cb)
 	//fmt.Println()
 
 	// Reverse turn
-	cb = cb.Turn(internal.Xax, 0, internal.Counterclock)
-	cb = cb.Turn(internal.Zax, -1, internal.Clock)
-	cb = cb.Turn(internal.Xax, 0, internal.Clock)
-	cb = cb.Turn(internal.Zax, -1, internal.Counterclock)
-	cb = cb.Turn(internal.Xax, 0, internal.Counterclock)
-	cb = cb.Turn(internal.Zax, -1, internal.Clock)
-	cb = cb.Turn(internal.Zax, -1, internal.Clock)
-	cb = cb.Turn(internal.Xax, 0, internal.Clock)
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Clock})
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Clock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Counterclock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Clock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: -1, Direction: internal.Clock})
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: 0, Direction: internal.Clock})
 	//fmt.Println(cb)
 	//fmt.Println()
 
-	cb = cb.Turn(internal.Zax, 1, internal.Clock)
-	cb = cb.Turn(internal.Zax, 1, internal.Clock)
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: 1, Direction: internal.Clock})
+	cb = cb.Move(internal.Move{Axis: internal.Zax, Idx: 1, Direction: internal.Clock})
 	return cb
 }
 

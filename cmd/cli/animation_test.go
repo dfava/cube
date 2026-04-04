@@ -22,7 +22,7 @@ func TestAnimationMarchingTogether(t *testing.T) {
 	var startFl Flat
 	startFl.PaintCube(cb)
 
-	// Simulation logic from animateMove
+	// Simulation logic from RigidAnimator.Animate
 	visited := make(map[[2]int]bool)
 	var cycles [][][2]int
 	for start := range perm {
@@ -81,7 +81,7 @@ func TestAnimationMarchingTogether(t *testing.T) {
 	for frame := 0; frame <= int(n); frame++ {
 		tempFl := startFl.Copy()
 		if frame == int(n) {
-			nextCb := cb.Turn(ax, idx, dir)
+			nextCb := cb.Move(Move{Axis: ax, Idx: idx, Direction: dir})
 			if n%2 == 1 && idx == 0 {
 				nextCb = nextCb.Rotate(ax, !dir)
 			}
@@ -149,7 +149,7 @@ func TestAnimationCorrectPositions(t *testing.T) {
 			var startFl Flat
 			startFl.PaintCube(cb)
 
-			nextCb := cb.Turn(ax, idx, dir)
+			nextCb := cb.Move(Move{Axis: ax, Idx: idx, Direction: dir})
 			if n%2 == 1 && idx == 0 {
 				nextCb = nextCb.Rotate(ax, !dir)
 			}
@@ -159,7 +159,7 @@ func TestAnimationCorrectPositions(t *testing.T) {
 			frame := int(n)
 			tempFl := startFl.Copy()
 			if frame == int(n) {
-				nextCb := cb.Turn(ax, idx, dir)
+				nextCb := cb.Move(Move{Axis: ax, Idx: idx, Direction: dir})
 				if n%2 == 1 && idx == 0 {
 					nextCb = nextCb.Rotate(ax, !dir)
 				}

@@ -29,26 +29,26 @@ func main() {
 	fmt.Println(cb)
 	fmt.Println()
 
-	cb = cb.Turn(internal.Xax, -1, internal.Counterclock) // g
-	cb = cb.Turn(internal.Yax, -1, internal.Counterclock) // h
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: -1, Direction: internal.Counterclock}) // g
+	cb = cb.Move(internal.Move{Axis: internal.Yax, Idx: -1, Direction: internal.Counterclock}) // h
 	fmt.Println("g . h")
 	fmt.Println(cb)
 	fmt.Println()
 
 	cb.Reset()
 
-	cb = cb.Turn(internal.Xax, -1, internal.Clock) // g^(-1)
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: -1, Direction: internal.Clock}) // g^(-1)
 	//fmt.Println(cb)
 	//fmt.Println()
-	cb = cb.Turn(internal.Yax, -1, internal.Clock) // h^(-1)
+	cb = cb.Move(internal.Move{Axis: internal.Yax, Idx: -1, Direction: internal.Clock}) // h^(-1)
 	//fmt.Println("g^(-1) . h^(-1)")
 	//fmt.Println(cb)
 	//fmt.Println()
 
-	cb = cb.Turn(internal.Xax, -1, internal.Counterclock) // g
+	cb = cb.Move(internal.Move{Axis: internal.Xax, Idx: -1, Direction: internal.Counterclock}) // g
 	//fmt.Println(cb)
 	//fmt.Println()
-	cb = cb.Turn(internal.Yax, -1, internal.Counterclock) // h
+	cb = cb.Move(internal.Move{Axis: internal.Yax, Idx: -1, Direction: internal.Counterclock}) // h
 	fmt.Println("g^(-1) . h^(-1) . g . h")
 	fmt.Println(cb)
 	fmt.Println()

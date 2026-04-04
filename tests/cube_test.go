@@ -55,14 +55,14 @@ func TestTurn(t *testing.T) {
 		// Perform turns
 		for num_perms = 0; num_perms < int(times); num_perms += 1 {
 			//fmt.Println(perms[num_perms])
-			final = final.Turn(perms[num_perms].ax, perms[num_perms].idx, perms[num_perms].dir)
+			final = final.Move(Move{Axis: perms[num_perms].ax, Idx: perms[num_perms].idx, Direction: perms[num_perms].dir})
 		}
 		//fmt.Println()
 		//fmt.Println(final)
 		// Perform, in reverse, the reverse of the turns
 		for num_perms = int(times) - 1; num_perms >= 0; num_perms -= 1 {
 			//fmt.Println(perms[num_perms])
-			final = final.Turn(perms[num_perms].ax, perms[num_perms].idx, !perms[num_perms].dir)
+			final = final.Move(Move{Axis: perms[num_perms].ax, Idx: perms[num_perms].idx, Direction: !perms[num_perms].dir})
 		}
 		// Make sure init and final are the same
 		if cube.String() != final.String() {
